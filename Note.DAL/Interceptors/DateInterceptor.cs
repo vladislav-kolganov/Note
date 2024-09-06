@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Note.DAL.Interceptors
-{                                /**/   
+{                                /* конструктор */   
     public class DateInterceptor (IHttpContextAccessor httpContextAccessor) : SaveChangesInterceptor
 
     {
@@ -45,11 +45,12 @@ namespace Note.DAL.Interceptors
                 if (entry.State == EntityState.Added) // проверка на добавление объекта
                 { 
                     entry.Property(x => x.CreatedAt).CurrentValue = DateTime.UtcNow; // присвоение значение полю "дата создания" 
-                    
+                    entry.Property(x => x.CreatedBy).CurrentValue = GetUserId();
                 }
                 if (entry.State == EntityState.Modified) // проверка на изменение объекта
                 { 
                     entry.Property(x=>x.UpdatedAt).CurrentValue = DateTime.UtcNow;
+                    entry.Property(x => x.UpdatedBy).CurrentValue = GetUserId();
                 }
 
               
