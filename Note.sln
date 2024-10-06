@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.API", "Note.API\Note.API.csproj", "{D4409D3C-143C-4285-A0BC-467F25C9EACF}"
 	ProjectSection(ProjectDependencies) = postProject
+		{3B9F202F-1775-4249-9C80-979B89A4D226} = {3B9F202F-1775-4249-9C80-979B89A4D226}
 		{81CAECBB-37E9-4DFB-ABD6-D820AA2FCCAC} = {81CAECBB-37E9-4DFB-ABD6-D820AA2FCCAC}
 	EndProjectSection
 EndProject
@@ -18,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.Domain", "Note.Domain\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.DAL", "Note.DAL\Note.DAL.csproj", "{81CAECBB-37E9-4DFB-ABD6-D820AA2FCCAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Note.Application", "Note.Application\Note.Application.csproj", "{3B9F202F-1775-4249-9C80-979B89A4D226}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Note.Application", "Note.Application\Note.Application.csproj", "{3B9F202F-1775-4249-9C80-979B89A4D226}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

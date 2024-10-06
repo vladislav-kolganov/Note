@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Note.Domain.Interfaces
+namespace Note.Domain.Result
 {
-    public interface IEntityId <T> where T : struct
+    public class CollectionResult <T>: BaseResult<IEnumerable<T>>
     {
-        public T Id { get; set; }
+        public int Count { get; set; }
     }
 }

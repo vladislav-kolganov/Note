@@ -15,9 +15,9 @@ namespace Note.Domain.Entity
 
         public List<Report> Reports { get; set; } // прописываем связь Пользователь (1) составляет (:) Монжество отчётов (М) 
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public long CreatedBy { get; set; }
-        public long UpdatedBy { get; set; }
+        public long? UpdatedBy { get; set; }
     }
 }
