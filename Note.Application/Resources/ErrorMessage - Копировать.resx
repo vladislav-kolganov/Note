@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="InternalServerError" xml:space="preserve">
-    <value>Внутренняя ошибка сервера</value>
+    <value>Внтуренняя ошибка сервера</value>
   </data>
   <data name="ReportsNotFound" xml:space="preserve">
     <value>Отчёты не найдены</value>
@@ -134,17 +134,5 @@
   </data>
   <data name="PasswordNotEqualPasswordConfirm" xml:space="preserve">
     <value>Пароли не совпадают</value>
-  </data>
-  <data name="UserAlreadyExists" xml:space="preserve">
-    <value>Пользователь с таким именем уже существует</value>
-  </data>
-  <data name="PasswordIsWrong" xml:space="preserve">
-    <value>Пароль не верный</value>
-  </data>
-  <data name="InvalidToken" xml:space="preserve">
-    <value>Невалидный токен</value>
-  </data>
-  <data name="InvalidClientRequest" xml:space="preserve">
-    <value>Невалидный запрос клиента</value>
   </data>
 </root>

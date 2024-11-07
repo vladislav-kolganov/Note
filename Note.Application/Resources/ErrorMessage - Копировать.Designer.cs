@@ -22,14 +22,14 @@ namespace Note.Application.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ErrorMessage {
+    internal class ErrorMessage___Копировать {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ErrorMessage() {
+        internal ErrorMessage___Копировать() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Note.Application.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Note.Application.Resources.ErrorMessage", typeof(ErrorMessage).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Note.Application.Resources.ErrorMessage - Копировать", typeof(ErrorMessage___Копировать).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,33 +66,6 @@ namespace Note.Application.Resources {
         internal static string InternalServerError {
             get {
                 return ResourceManager.GetString("InternalServerError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Невалидный запрос клиента.
-        /// </summary>
-        internal static string InvalidClientRequest {
-            get {
-                return ResourceManager.GetString("InvalidClientRequest", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Невалидный токен.
-        /// </summary>
-        internal static string InvalidToken {
-            get {
-                return ResourceManager.GetString("InvalidToken", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Пароль не верный.
-        /// </summary>
-        internal static string PasswordIsWrong {
-            get {
-                return ResourceManager.GetString("PasswordIsWrong", resourceCulture);
             }
         }
         
@@ -129,15 +102,6 @@ namespace Note.Application.Resources {
         internal static string ReportsNotFound {
             get {
                 return ResourceManager.GetString("ReportsNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Пользователь с таким именем уже существует.
-        /// </summary>
-        internal static string UserAlreadyExists {
-            get {
-                return ResourceManager.GetString("UserAlreadyExists", resourceCulture);
             }
         }
         

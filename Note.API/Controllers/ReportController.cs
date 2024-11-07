@@ -1,9 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Note.Domain.Dto.ReportDto;
-using Note.Domain.Entity;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
 
@@ -21,11 +19,11 @@ namespace Note.API.Controllers
             _reportService = reportService;
         }
 
-        [HttpGet ("{id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<BaseResult<ReportDto>>> GetReport(long id)
-        { 
+        {
             var response = await _reportService.GetReportAsync(id);
             if (response.IsSuccess)
             {
@@ -59,11 +57,25 @@ namespace Note.API.Controllers
             }
             return BadRequest(response);
         }
-       
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reportDto"></param>
+        /// <remarks> 
+        /// Request for create report
+        /// Post { 
+        ///       "Name" : "Report test",
+        ///       "Description" : "Test description",
+        ///       "userid" : 1}
+        /// </remarks>
+
+
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]             //FromBody - означает, что считываем с тела запроса
-        public async Task<ActionResult<BaseResult<ReportDto>>> CreateReport([FromBody]CreateReportDto reportDto) 
+        public async Task<ActionResult<BaseResult<ReportDto>>> CreateReport([FromBody] CreateReportDto reportDto)
         {
             var response = await _reportService.CreateReportAsync(reportDto);
             if (response.IsSuccess)
@@ -71,12 +83,12 @@ namespace Note.API.Controllers
                 return Ok(response);
             }
             return BadRequest(response);
-        } 
+        }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]             
-        public async Task<ActionResult<BaseResult<ReportDto>>> CreateReport([FromBody]UpdateReportDto reportDto) 
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<BaseResult<ReportDto>>> UpdateReport([FromBody] UpdateReportDto reportDto)
         {
             var response = await _reportService.UpdateReportAsync(reportDto);
             if (response.IsSuccess)

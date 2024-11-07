@@ -15,6 +15,7 @@ namespace Note.Application.DependencyInjection
         public static void AddApplication(this IServiceCollection services)
         {
             services.AddAutoMapper(typeof(ReportMapping));
+            services.AddAutoMapper(typeof(UserMapping));
             InitServices(services);
 
             InitFluentValidation(services);
@@ -23,6 +24,8 @@ namespace Note.Application.DependencyInjection
         public static void InitServices(this IServiceCollection services)
         {
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenService, TokenService>();
         }
 
         public static void InitFluentValidation(this IServiceCollection services)

@@ -15,6 +15,13 @@ namespace Note.DAL.Configurations
             .HasForeignKey(report => report.UserId)
             .HasPrincipalKey(user => user.Id);
 
+            builder.HasMany<Role>(user => user.Role).WithMany(role => role.Users)
+                .UsingEntity<UserRole>
+                (
+                    r => r.HasOne<Role>().WithMany().HasForeignKey(x => x.RoleId),
+                    u => u.HasOne<User>().WithMany().HasForeignKey(x => x.UserId) 
+                );
+            
             builder.HasData(new List<User>()
             {
                 new User()

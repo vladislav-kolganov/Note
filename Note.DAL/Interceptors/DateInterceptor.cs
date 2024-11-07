@@ -18,78 +18,32 @@ namespace Note.DAL.Interceptors
         //{
 
         //}
-        public override ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
+        public override  ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
+         CancellationToken cancellationToken = new CancellationToken())
         {
             var dbContext = eventData.Context;
             if (dbContext == null)
             {
-                return  base.SavedChangesAsync(eventData, result, cancellationToken);
+                return   base.SavingChangesAsync(eventData, result, cancellationToken);
             }
 
             var entries = dbContext.ChangeTracker.Entries<IAuditable>()
-            .Where(x => x.State == EntityState.Modified || x.State == EntityState.Added)
-            .ToList(); // хранение свойств из интерфейса IAuditable
-
+                .Where(x => x.State == EntityState.Added || x.State == EntityState.Modified)
+                .ToList();
             foreach (var entry in entries)
             {
-                if (entry.State == EntityState.Added) // проверка на добавление объекта
+                if (entry.State == EntityState.Added)
                 {
-                    entry.Property(x => x.CreatedAt).CurrentValue = DateTime.UtcNow; // присвоение значение полю "дата создания" 
-                    entry.Property(x => x.CreatedBy).CurrentValue = GetUserId();
+                    entry.Property(x => x.CreatedAt).CurrentValue = DateTime.UtcNow;
                 }
-                if (entry.State == EntityState.Modified) // проверка на изменение объекта
+
+                if (entry.State == EntityState.Modified)
                 {
                     entry.Property(x => x.UpdatedAt).CurrentValue = DateTime.UtcNow;
-                    entry.Property(x => x.UpdatedBy).CurrentValue = GetUserId();
                 }
-
-
             }
-            return base.SavedChangesAsync(eventData, result, cancellationToken);
+
+            return   base.SavingChangesAsync(eventData, result, cancellationToken);
         }
-
-        private long GetUserId()
-        {
-            var httpContext = httpContextAccessor.HttpContext;
-            if (httpContext.User.Identity.IsAuthenticated)
-            {
-                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long userId))
-                {
-                    return userId;
-                }
-            }
-            return 0;
-        }
-
-        public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
-        {
-            var dbContext = eventData.Context;
-            if (dbContext == null)
-            {
-                return base.SavingChanges(eventData, result);
-            }
-
-            var entries = dbContext.ChangeTracker.Entries<IAuditable>(); // хранение свойств из интерфейса IAuditable
-
-            foreach (var entry in entries)
-            {
-                if (entry.State == EntityState.Added) // проверка на добавление объекта
-                { 
-                    entry.Property(x => x.CreatedAt).CurrentValue = DateTime.UtcNow; // присвоение значение полю "дата создания" 
-                    entry.Property(x => x.CreatedBy).CurrentValue = GetUserId();
-                }
-                if (entry.State == EntityState.Modified) // проверка на изменение объекта
-                { 
-                    entry.Property(x=>x.UpdatedAt).CurrentValue = DateTime.UtcNow;
-                   entry.Property(x => x.UpdatedBy).CurrentValue = GetUserId();
-                }
-
-              
-            }
-
-            return base.SavingChanges(eventData, result);
-        }
-
     }
 }

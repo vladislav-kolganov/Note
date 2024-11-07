@@ -1,9 +1,4 @@
 ﻿using Note.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Note.Domain.Entity
 {
@@ -13,7 +8,9 @@ namespace Note.Domain.Entity
         public string Login { get; set; }
         public string Password { get; set; }
 
+        public UserToken UserToken { get; set; }
         public List<Report> Reports { get; set; } // прописываем связь Пользователь (1) составляет (:) Монжество отчётов (М) 
+        public List<Role> Role { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

@@ -17,7 +17,7 @@ namespace Note.DAL
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         { 
-          Database.EnsureCreated(); // проверка на существование БД, если нет - то создание бд, иначе - инициализация с бд 
+          Database.EnsureCreated(); // проверка на существование БД, если нет - то создание бд, иначе - инициализация с бд
         }
 
         protected  override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) // DbContextOptionsBuilder optionsBuilder: Параметр, который предоставляет API для настройки DbContext.

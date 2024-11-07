@@ -132,4 +132,19 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>User not found</value>
   </data>
+  <data name="PasswordNotEqualPasswordConfirm" xml:space="preserve">
+    <value>Password not equal passwordconfirm</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>User already exists</value>
+  </data>
+  <data name="PasswordIsWrong" xml:space="preserve">
+    <value>Password is wrong</value>
+  </data>
+  <data name="InvalidToken" xml:space="preserve">
+    <value>Invalid token</value>
+  </data>
+  <data name="InvalidClientRequest" xml:space="preserve">
+    <value>Invalid сlient request</value>
+  </data>
 </root>
