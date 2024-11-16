@@ -26,7 +26,7 @@ namespace Note.DAL.Repositories
             if (entity != null)
             {
                 _dbContext.Add(entity); //  добавляем объект в контекст
-                _dbContext.SaveChanges(); // фиксируем изменения в бд
+        
                 return Task.FromResult(entity);
             }
             else throw new ArgumentNullException("Entity is null"); 
@@ -37,7 +37,7 @@ namespace Note.DAL.Repositories
             if (entity != null)
             {
                 _dbContext.Update(entity);
-                 _dbContext.SaveChanges();
+        
                 return Task.FromResult(entity);
             }
             else throw new ArgumentNullException("Entity is null");
@@ -48,7 +48,7 @@ namespace Note.DAL.Repositories
             if (entity != null)
             {
                 _dbContext.Remove(entity);
-                 _dbContext.SaveChanges();
+        
                 return Task.FromResult(entity);
             }
             else throw new ArgumentNullException("Entity is null");
