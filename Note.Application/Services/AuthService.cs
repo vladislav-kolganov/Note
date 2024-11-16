@@ -8,33 +8,44 @@ using Note.Domain.Enum;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
+using Serilog;
+using System.ComponentModel.Design;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Serilog;
 
 namespace Note.Application.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IBaseRepository<User> _userRepositoory;
         private readonly IBaseRepository<UserToken> _userTokenRepository;
+        private readonly IBaseRepository<Role> _roleRepository;
+        private readonly IBaseRepository<UserRole> _userRoleRepository;
         private readonly ILogger _logger;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
-        public AuthService(IBaseRepository<User> userRepositoory,ILogger logger, IMapper mapper, IBaseRepository<UserToken> userTokenRepository, ITokenService tokenService)
+
+        public AuthService(IBaseRepository<User> userRepositoory, ILogger logger, IMapper mapper, IBaseRepository<UserToken> userTokenRepository, ITokenService tokenService, IBaseRepository<Role> roleRepository, IBaseRepository<UserRole> userRoleRepository, IUnitOfWork unitOfWork)
         {
             _userRepositoory = userRepositoory;
             _logger = logger;
             _mapper = mapper;
             _userTokenRepository = userTokenRepository;
             _tokenService = tokenService;
+            _roleRepository = roleRepository;
+            _userRoleRepository = userRoleRepository;
+            _unitOfWork = unitOfWork;
         }
         public async Task<BaseResult<TokenDto>> Login(LoginUserDto dto)
         {
             try
             {
-                var user = await _userRepositoory.GetAll().FirstOrDefaultAsync(x => x.Login == dto.Login);
+                var user = await _userRepositoory.GetAll()
+                    .Include(x => x.Role)
+                    .FirstOrDefaultAsync(x => x.Login == dto.Login);
+
                 if (user == null)
                 {
                     return new BaseResult<TokenDto>()
@@ -55,12 +66,11 @@ namespace Note.Application.Services
                     };
                 }
                 var userToken = await _userTokenRepository.GetAll().FirstOrDefaultAsync(x => x.UserId == user.Id);
-             
-                var claims = new List<Claim>()
-                {
-                    new Claim ( ClaimTypes.Name, dto.Login),
-                    new Claim (ClaimTypes.Role,"User"),
-                };
+                var userRols = user.Role;
+
+                var claims = userRols.Select(x => new Claim(ClaimTypes.Role, x.Name)).ToList();
+                claims.Add(new Claim(ClaimTypes.Name, dto.Login));
+
                 var accessToken = _tokenService.GenerateAccessToken(claims);
                 var refreshToken = _tokenService.GenerateRefreshToken();
                 if (userToken == null)
@@ -74,7 +84,7 @@ namespace Note.Application.Services
 
                     await _userTokenRepository.CreateAsync(userToken);
                 }
-                else 
+                else
                 {
                     userToken.RefreshToken = refreshToken;
                     userToken.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
@@ -124,17 +134,51 @@ namespace Note.Application.Services
 
             var hashUserPassword = HashPassword(dto.Password);
 
-            var users = new User()
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
-                Login = dto.Login,
-                Password = hashUserPassword
-            };
-            await _userRepositoory.CreateAsync(users);
-            return new BaseResult<UserDto>
-            {
-                Data = _mapper.Map<UserDto>(users)
-            };
-        
+                try
+                {
+                    var users = new User()
+                    {
+                        Login = dto.Login,
+                        Password = hashUserPassword
+                    };
+                    await _unitOfWork.Users.CreateAsync(users);
+                    var role = await _roleRepository.GetAll().FirstOrDefaultAsync(x => x.Name == "User");
+                    if (role != null)
+                    {
+                        return new BaseResult<UserDto>
+                        {
+                            ErrorMessage = ErrorMessage.RoleNotFound,
+                            ErrorCode = (int)ErrorCodes.RoleNotFound
+                        };
+                    }
+                    UserRole userRole = new UserRole()
+                    {
+                        RoleId = role.Id,
+                        UserId = user.Id
+                    };
+                    await _unitOfWork.UserRoles.CreateAsync(userRole);
+
+                    await transaction.CommitAsync();
+                    return new BaseResult<UserDto>
+                    {
+                        Data = _mapper.Map<UserDto>(users)
+                    };
+                
+                }
+                catch 
+                {
+                    await transaction.RollbackAsync();
+                    return new BaseResult<UserDto>
+                    {
+                        ErrorMessage = ErrorMessage.InternalServerError,
+                        ErrorCode = (int)ErrorCodes.InternalServerError
+                    };
+                }           
+            }
+
+
         }
 
         private string HashPassword(string password)

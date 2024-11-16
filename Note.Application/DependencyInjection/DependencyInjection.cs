@@ -24,6 +24,7 @@ namespace Note.Application.DependencyInjection
         public static void InitServices(this IServiceCollection services)
         {
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IRoleService, RoleServices>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
         }

@@ -27,15 +27,15 @@ namespace Note.DAL.Configurations
                 new User()
                 {
                     Id = 1,
-                    Login = "user1",
-                    Password = "veververervrevverervv",
+                    Login = "Bob",
+                    Password = "1221",
                     CreatedAt = DateTime.UtcNow
                 },
                 new User()
                 {
                     Id = 2,
                     Login = "user2",
-                    Password = "tesrjigbejrfhibugehjrfiu",
+                    Password = "1221",
                     CreatedAt = DateTime.UtcNow
                 }
             });

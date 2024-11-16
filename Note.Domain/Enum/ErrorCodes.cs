@@ -12,8 +12,12 @@
         UserNotFound = 11,
         UserAlreadyExists = 12,
         Unauthorized = 13,
+        UserAlreadyExistsThisRole = 14,
 
         PasswordNotEqualPasswordConfirm = 21,
         PasswordIsWrong = 22,
+
+        RoleAlreadyExists = 31,
+        RoleNotFound = 32
     }
 }
