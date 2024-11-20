@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Note.DAL.Interceptors;
 using Note.DAL.Repositories;
 using Note.Domain.Entity;
+using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.Repositories;
 
 namespace Note.DAL.DependencyInjection
@@ -26,6 +27,7 @@ namespace Note.DAL.DependencyInjection
 
         private static void InitRepositories(this IServiceCollection services) // регистрация репозиториев
         {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IBaseRepository<User>, BaseRepository<User>>();
             services.AddScoped<IBaseRepository<Role>, BaseRepository<Role>>();
             services.AddScoped<IBaseRepository<UserRole>, BaseRepository<UserRole>>();

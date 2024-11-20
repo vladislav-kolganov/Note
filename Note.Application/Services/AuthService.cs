@@ -5,11 +5,11 @@ using Note.Domain.Dto;
 using Note.Domain.Dto.UserDto;
 using Note.Domain.Entity;
 using Note.Domain.Enum;
+using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
 using Serilog;
-using System.ComponentModel.Design;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -27,7 +27,9 @@ namespace Note.Application.Services
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
-        public AuthService(IBaseRepository<User> userRepositoory, ILogger logger, IMapper mapper, IBaseRepository<UserToken> userTokenRepository, ITokenService tokenService, IBaseRepository<Role> roleRepository, IBaseRepository<UserRole> userRoleRepository, IUnitOfWork unitOfWork)
+        public AuthService(IBaseRepository<User> userRepositoory, ILogger logger, IMapper mapper,
+            IBaseRepository<UserToken> userTokenRepository, ITokenService tokenService, IBaseRepository<Role> roleRepository,
+            IBaseRepository<UserRole> userRoleRepository, IUnitOfWork unitOfWork)
         {
             _userRepositoory = userRepositoory;
             _logger = logger;
@@ -40,76 +42,65 @@ namespace Note.Application.Services
         }
         public async Task<BaseResult<TokenDto>> Login(LoginUserDto dto)
         {
-            try
-            {
-                var user = await _userRepositoory.GetAll()
+            var user = await _userRepositoory.GetAll()
                     .Include(x => x.Role)
                     .FirstOrDefaultAsync(x => x.Login == dto.Login);
 
-                if (user == null)
-                {
-                    return new BaseResult<TokenDto>()
-                    {
-                        ErrorMessage = ErrorMessage.UserNotFound,
-                        ErrorCode = (int)ErrorCodes.UserNotFound
-                    };
-                }
-
-                var isVerifyPassword = IsVerifyPassword(user.Password, dto.Password);
-
-                if (!isVerifyPassword)
-                {
-                    return new BaseResult<TokenDto>()
-                    {
-                        ErrorMessage = ErrorMessage.PasswordIsWrong,
-                        ErrorCode = (int)ErrorCodes.PasswordIsWrong
-                    };
-                }
-                var userToken = await _userTokenRepository.GetAll().FirstOrDefaultAsync(x => x.UserId == user.Id);
-                var userRols = user.Role;
-
-                var claims = userRols.Select(x => new Claim(ClaimTypes.Role, x.Name)).ToList();
-                claims.Add(new Claim(ClaimTypes.Name, dto.Login));
-
-                var accessToken = _tokenService.GenerateAccessToken(claims);
-                var refreshToken = _tokenService.GenerateRefreshToken();
-                if (userToken == null)
-                {
-                    userToken = new UserToken()
-                    {
-                        UserId = user.Id,
-                        RefreshToken = refreshToken,
-                        RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7),
-                    };
-
-                    await _userTokenRepository.CreateAsync(userToken);
-                }
-                else
-                {
-                    userToken.RefreshToken = refreshToken;
-                    userToken.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-                    await _userTokenRepository.UpdateAsync(userToken);
-                }
-
-                return new BaseResult<TokenDto>()
-                {
-                    Data = new TokenDto()
-                    {
-                        RefreshToken = refreshToken,
-                        AccessToken = accessToken
-                    }
-                };
-            }
-            catch (Exception ex)
+            if (user == null)
             {
-                _logger.Error(ex, ex.Message);
                 return new BaseResult<TokenDto>()
                 {
-                    ErrorMessage = ErrorMessage.InternalServerError,
-                    ErrorCode = (int)ErrorCodes.InternalServerError
+                    ErrorMessage = ErrorMessage.UserNotFound,
+                    ErrorCode = (int)ErrorCodes.UserNotFound
+                };
+            }
+
+            var isVerifyPassword = IsVerifyPassword(user.Password, dto.Password);
+
+            if (!isVerifyPassword)
+            {
+                return new BaseResult<TokenDto>()
+                {
+                    ErrorMessage = ErrorMessage.PasswordIsWrong,
+                    ErrorCode = (int)ErrorCodes.PasswordIsWrong
+                };
+            }
+            var userToken = await _userTokenRepository.GetAll().FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var userRols = user.Role;
+
+            var claims = userRols.Select(x => new Claim(ClaimTypes.Role, x.Name)).ToList();
+            claims.Add(new Claim(ClaimTypes.Name, dto.Login));
+
+            var accessToken = _tokenService.GenerateAccessToken(claims);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            if (userToken == null)
+            {
+                userToken = new UserToken()
+                {
+                    UserId = user.Id,
+                    RefreshToken = refreshToken,
+                    RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7),
                 };
 
+                await _userTokenRepository.CreateAsync(userToken);
             }
+            else
+            {
+                userToken.RefreshToken = refreshToken;
+                userToken.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+                _userTokenRepository.Update(userToken);
+                await _userTokenRepository.SaveChangeAsync();
+
+            }
+
+            return new BaseResult<TokenDto>()
+            {
+                Data = new TokenDto()
+                {
+                    RefreshToken = refreshToken,
+                    AccessToken = accessToken
+                }
+            };
         }
 
         public async Task<BaseResult<UserDto>> Register(RegisterUserDto dto)
@@ -138,14 +129,15 @@ namespace Note.Application.Services
             {
                 try
                 {
-                    var users = new User()
+                    user = new User()
                     {
                         Login = dto.Login,
                         Password = hashUserPassword
                     };
-                    await _unitOfWork.Users.CreateAsync(users);
-                    var role = await _roleRepository.GetAll().FirstOrDefaultAsync(x => x.Name == "User");
-                    if (role != null)
+                    await _unitOfWork.Users.CreateAsync(user);
+                    await _unitOfWork.SaveChangeAsync();
+                    var role = await _roleRepository.GetAll().FirstOrDefaultAsync(x => x.Name == nameof(RoleCodes.User));
+                    if (role == null)
                     {
                         return new BaseResult<UserDto>
                         {
@@ -159,15 +151,16 @@ namespace Note.Application.Services
                         UserId = user.Id
                     };
                     await _unitOfWork.UserRoles.CreateAsync(userRole);
+                    await _unitOfWork.SaveChangeAsync();
 
                     await transaction.CommitAsync();
                     return new BaseResult<UserDto>
                     {
-                        Data = _mapper.Map<UserDto>(users)
+                        Data = _mapper.Map<UserDto>(user)
                     };
-                
+
                 }
-                catch 
+                catch
                 {
                     await transaction.RollbackAsync();
                     return new BaseResult<UserDto>
@@ -175,7 +168,7 @@ namespace Note.Application.Services
                         ErrorMessage = ErrorMessage.InternalServerError,
                         ErrorCode = (int)ErrorCodes.InternalServerError
                     };
-                }           
+                }
             }
 
 

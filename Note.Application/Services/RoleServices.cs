@@ -23,8 +23,6 @@ namespace Note.Application.Services
             _roleRepository = roleRepository;
             _mapper = mapper;
         }
-
-
         public async Task<BaseResult<RoleDto>> CreateRoleAsync(CreateRoleDto dto)
         {
             var role = await _roleRepository.GetAll().FirstOrDefaultAsync(x => x.Name == dto.Name);
@@ -42,7 +40,7 @@ namespace Note.Application.Services
             };
 
             await _roleRepository.CreateAsync(role);
-
+            await _roleRepository.SaveChangeAsync();
             return new BaseResult<RoleDto>()
             {
                 Data = _mapper.Map<RoleDto>(role)
@@ -60,7 +58,8 @@ namespace Note.Application.Services
                     ErrorCode = (int)ErrorCodes.RoleNotFound
                 };
             }
-            await _roleRepository.RemoveAsync(role);
+            _roleRepository.Remove(role);
+            await _roleRepository.SaveChangeAsync();
             return new BaseResult<RoleDto>()
             {
                 Data = _mapper.Map<RoleDto>(role)
@@ -79,10 +78,11 @@ namespace Note.Application.Services
                     ErrorCode = (int)ErrorCodes.RoleNotFound
                 };
             }
-            await _roleRepository.UpdateAsync(role);
+            var updatedRole = _roleRepository.Update(role);
+            await _roleRepository.SaveChangeAsync();
             return new BaseResult<RoleDto>()
             {
-                Data = _mapper.Map<RoleDto>(role)
+                Data = _mapper.Map<RoleDto>(updatedRole)
             };
         }
 
@@ -102,7 +102,7 @@ namespace Note.Application.Services
             var roles = user.Role.Select(x => x.Name).ToArray();
             if (roles.Any(x => x != dto.RoleName))
             {
-                var role= await _roleRepository.GetAll().FirstOrDefaultAsync(x => x.Name == dto.RoleName);
+                var role = await _roleRepository.GetAll().FirstOrDefaultAsync(x => x.Name == dto.RoleName);
                 if (role == null)
                 {
                     return new BaseResult<UserRoleDto>
@@ -117,13 +117,13 @@ namespace Note.Application.Services
                     UserId = user.Id
                 };
                 await _userRoleRepository.CreateAsync(userRole);
-
+                await _userRepository.SaveChangeAsync();
                 return new BaseResult<UserRoleDto>
                 {
-                    Data = new UserRoleDto() 
+                    Data = new UserRoleDto()
                     {
                         Login = user.Login,
-                        RoleName = role.Name    ,
+                        RoleName = role.Name,
                     }
                 };
             }
@@ -131,9 +131,9 @@ namespace Note.Application.Services
             return new BaseResult<UserRoleDto>
             {
                 ErrorMessage = ErrorMessage.UserAlreadyExistsThisRole,
-                ErrorCode = (int) ErrorCodes.UserAlreadyExistsThisRole,
+                ErrorCode = (int)ErrorCodes.UserAlreadyExistsThisRole,
             };
-         
+
         }
     }
 }

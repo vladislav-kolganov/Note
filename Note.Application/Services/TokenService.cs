@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿    using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Note.Application.Resources;
@@ -95,7 +95,8 @@ namespace Note.Application.Services
 
             user.UserToken.RefreshToken = newRefreshToken;
 
-            await _userRepository.UpdateAsync(user);
+           _userRepository.Update(user);
+            await _userRepository.SaveChangeAsync();
 
             return new BaseResult<TokenDto>()
             {

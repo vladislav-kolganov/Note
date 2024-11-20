@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Note.Domain.Interfaces.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,15 +7,16 @@ using System.Threading.Tasks;
 
 namespace Note.Domain.Interfaces.Repositories
 {
-    public interface IBaseRepository<TEntity> 
+    public interface IBaseRepository<TEntity> : IStateSaveChanges
     {   // прописываем CRUD операции
         IQueryable<TEntity> GetAll(); // select - извлеение записей из бд
 
-        Task<TEntity> CreateAsync (TEntity entity); // insert
+       Task <TEntity> CreateAsync (TEntity entity); // insert
 
-        Task<TEntity> UpdateAsync (TEntity entity); // update 
+        TEntity Update (TEntity entity); // update 
 
-        Task<TEntity>  RemoveAsync (TEntity entity);  // delete
+        void  Remove (TEntity entity);  // delete
+     
 
     }
 }

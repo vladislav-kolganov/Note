@@ -21,37 +21,42 @@ namespace Note.DAL.Repositories
             return _dbContext.Set<TEntity>();
         }
 
-        public  Task<TEntity> CreateAsync(TEntity entity) // добавляем в бд все объекты
+        public  async Task<TEntity> CreateAsync(TEntity entity) // добавляем в бд все объекты
         {
             if (entity != null)
             {
-                _dbContext.Add(entity); //  добавляем объект в контекст
+               await _dbContext.AddAsync(entity); //  добавляем объект в контекст
         
-                return Task.FromResult(entity);
+                return entity;
             }
             else throw new ArgumentNullException("Entity is null"); 
         }      
 
-        public  Task<TEntity> UpdateAsync(TEntity entity) // обновляем в бд все объекты
+        public  TEntity Update(TEntity entity) // обновляем в бд все объекты
         {
             if (entity != null)
             {
                 _dbContext.Update(entity);
         
-                return Task.FromResult(entity);
+                return entity;
             }
             else throw new ArgumentNullException("Entity is null");
         }
 
-        public  Task<TEntity> RemoveAsync(TEntity entity) // удаляем в бд все объекты
+        public void Remove(TEntity entity) // удаляем в бд все объекты
         {
             if (entity != null)
             {
                 _dbContext.Remove(entity);
         
-                return Task.FromResult(entity);
+               
             }
             else throw new ArgumentNullException("Entity is null");
+        }
+
+        public async Task<int> SaveChangeAsync()
+        {
+           return await _dbContext.SaveChangesAsync();
         }
     }
     
