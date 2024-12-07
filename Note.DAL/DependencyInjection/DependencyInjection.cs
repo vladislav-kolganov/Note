@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Note.DAL.Interceptors;
@@ -20,7 +19,7 @@ namespace Note.DAL.DependencyInjection
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-              options.UseNpgsql(connectionstring);
+                options.UseNpgsql(connectionstring);
             });         // регистрация DbContext Все необходимые зависимости мы настраиваем в этом методе, который мы будем вызывать в API
             services.InitRepositories();
         }

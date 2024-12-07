@@ -4,9 +4,12 @@ using Note.Application.DependencyInjection;
 using Note.DAL.DependencyInjection;
 using Note.Domain.Settings;
 using Serilog;
+using Note.Producer.DependencyInjection;
+using Note.Consumer.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection(nameof(RabbitMqSettings)));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.DefaultSection));
 // Add services to the container.
 
@@ -23,6 +26,10 @@ configuration.ReadFrom.Configuration(context.Configuration)); // берем конфигура
 
 builder.Services.AddDataAccessLayer(builder.Configuration); // регистрирование и добавление всех в зависимостей в слое DAL
 builder.Services.AddApplication();
+
+builder.Services.AddProducer();
+builder.Services.AddConsumer();
+
 
 var app = builder.Build();
 

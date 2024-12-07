@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Note.Application.Resources;
 using Note.Domain.Dto.ReportDto;
 using Note.Domain.Entity;
@@ -8,6 +9,8 @@ using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Interfaces.Validations;
 using Note.Domain.Result;
+using Note.Domain.Settings;
+using Note.Producer.Interfaces;
 using Serilog;
 
 namespace Note.Application.Services
@@ -18,17 +21,23 @@ namespace Note.Application.Services
         private readonly IBaseRepository<Report> _reportRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IReportValidator _reportValidator;
+        private readonly IMessageProducer _messageProducer;
+        private readonly IOptions<RabbitMqSettings> _rabbitMqSettings;
         private readonly IMapper _mappper;
         private readonly ILogger _logger;
 
-        public ReportService(IBaseRepository<Report> reportRepository, IBaseRepository<User> userRepository, IReportValidator reportValidator, ILogger logger, IMapper mapper)
+        public ReportService(IBaseRepository<Report> reportRepository, IBaseRepository<User> userRepository, 
+            IReportValidator reportValidator, ILogger logger, IMapper mapper, IMessageProducer messageProducer, IOptions<RabbitMqSettings> rabbitMqSettings)
         {
             _reportRepository = reportRepository;
             _userRepository = userRepository;
             _reportValidator = reportValidator;
             _logger = logger;
             _mappper = mapper;
+            _messageProducer = messageProducer;
+          _rabbitMqSettings = rabbitMqSettings;
         }
+
 
         public async Task<CollectionResult<ReportDto>> GetResultAsync(long userId)
         {
@@ -97,6 +106,8 @@ namespace Note.Application.Services
                 UserId = dto.UserId
             };
             await _reportRepository.CreateAsync(report);
+            await _reportRepository.SaveChangeAsync();
+            _messageProducer.SendMessage(report, _rabbitMqSettings.Value.RoutingKey, _rabbitMqSettings.Value.ExchangeName);
 
             return new BaseResult<ReportDto>()
             {

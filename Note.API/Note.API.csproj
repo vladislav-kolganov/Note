@@ -20,8 +20,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Note.Application\Note.Application.csproj" />
+    <ProjectReference Include="..\Note.Consumer\Note.Consumer.csproj" />
     <ProjectReference Include="..\Note.DAL\Note.DAL.csproj" />
     <ProjectReference Include="..\Note.Domain\Note.Domain.csproj" />
+    <ProjectReference Include="..\Note.Producer\Note.Producer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,10 +7,10 @@ using Note.Domain.Result;
 
 namespace Note.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
+    [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")] // путь до контроллера
-    [ApiController]
     public class ReportController : ControllerBase
     {
         private readonly IReportService _reportService;
@@ -29,6 +29,7 @@ namespace Note.API.Controllers
             {
                 return Ok(response);
             }
+
             return BadRequest(response);
         }
 
@@ -42,6 +43,7 @@ namespace Note.API.Controllers
             {
                 return Ok(response);
             }
+
             return BadRequest(response);
         }
 
@@ -55,6 +57,7 @@ namespace Note.API.Controllers
             {
                 return Ok(response);
             }
+
             return BadRequest(response);
         }
 
