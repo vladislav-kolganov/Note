@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Note.Application.Resources;
 using Note.Domain.Dto.ReportDto;
 using Note.Domain.Entity;
 using Note.Domain.Enum;
+using Note.Domain.Extensions;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Interfaces.Validations;
@@ -23,11 +25,13 @@ namespace Note.Application.Services
         private readonly IReportValidator _reportValidator;
         private readonly IMessageProducer _messageProducer;
         private readonly IOptions<RabbitMqSettings> _rabbitMqSettings;
+        private readonly IDistributedCache _cache;
         private readonly IMapper _mappper;
         private readonly ILogger _logger;
 
         public ReportService(IBaseRepository<Report> reportRepository, IBaseRepository<User> userRepository, 
-            IReportValidator reportValidator, ILogger logger, IMapper mapper, IMessageProducer messageProducer, IOptions<RabbitMqSettings> rabbitMqSettings)
+            IReportValidator reportValidator, ILogger logger, IMapper mapper, IMessageProducer messageProducer,
+            IOptions<RabbitMqSettings> rabbitMqSettings, IDistributedCache cache)
         {
             _reportRepository = reportRepository;
             _userRepository = userRepository;
@@ -36,6 +40,7 @@ namespace Note.Application.Services
             _mappper = mapper;
             _messageProducer = messageProducer;
           _rabbitMqSettings = rabbitMqSettings;
+            _cache = cache;
         }
 
 
@@ -79,6 +84,7 @@ namespace Note.Application.Services
                     ErrorCode = (int)ErrorCodes.ReportNotFound
                 };
             }
+            _cache.SetObject($"Report_{id}",report);
             return new BaseResult<ReportDto>
             {
                 Data = report
