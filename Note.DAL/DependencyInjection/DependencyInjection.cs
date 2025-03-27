@@ -2,11 +2,14 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Note.DAL.Interceptors;
 using Note.DAL.Repositories;
 using Note.Domain.Entity;
 using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.Repositories;
+using Note.Domain.Settings;
+using Note.Domain.Settings.DbSettings;
 
 namespace Note.DAL.DependencyInjection
 {
@@ -14,14 +17,20 @@ namespace Note.DAL.DependencyInjection
     {
         public static void AddDataAccessLayer(this IServiceCollection services, IConfiguration configuration) // подключаем зависимости для доступа к БД
         {
-            var connectionstring = configuration.GetConnectionString("PostgresSQL"); // хранение в переменной ключа подключения к бд
+            services.AddSettings(configuration);
 
             services.AddSingleton<DateInterceptor>();
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            var postgresSettings = configuration.GetSection(nameof(PostgresSettings));
+
+            services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
             {
-              options.UseNpgsql(connectionstring);
-            });         // регистрация DbContext Все необходимые зависимости мы настраиваем в этом методе, который мы будем вызывать в API
+                var postgresSettings = serviceProvider
+                    .GetRequiredService<IOptions<PostgresSettings>>()
+                    .Value;
+
+                options.UseNpgsql(postgresSettings.ConnectionString);
+            });
             services.InitRepositories();
         }
 
@@ -33,6 +42,22 @@ namespace Note.DAL.DependencyInjection
             services.AddScoped<IBaseRepository<UserRole>, BaseRepository<UserRole>>();
             services.AddScoped<IBaseRepository<UserToken>, BaseRepository<UserToken>>();
             services.AddScoped<IBaseRepository<Report>, BaseRepository<Report>>();
+        }
+
+        private static IServiceCollection AddSettings(this IServiceCollection services,
+        IConfiguration configuration)
+        {
+            services.Configure<PostgresSettings>(options => 
+            {
+                configuration.GetSection(nameof(PostgresSettings)); 
+            });
+            
+            services.Configure<JwtSettings>(options => 
+            {
+                configuration.GetSection(nameof(JwtSettings)); 
+            });
+
+            return services;
         }
     }
 }

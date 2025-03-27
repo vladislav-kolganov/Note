@@ -7,11 +7,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.DefaultSection));
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddAuthenticationAndAutorization(builder);
 builder.Services.AddSwagger();
@@ -34,7 +30,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(op =>
     {
         op.SwaggerEndpoint("/swagger/v1/swagger.json", "Note Swagger v 1.0");
-        op.SwaggerEndpoint("/swagger/v2/swagger.json", "Note Swagger v 2.0");
         op.RoutePrefix = string.Empty;
     });
 }
