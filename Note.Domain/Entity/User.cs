@@ -2,19 +2,54 @@
 
 namespace Note.Domain.Entity
 {
-    public class User : IEntityId<long>, IAuditable
+    /// <summary>
+    /// Модель пользователя
+    /// </summary>
+    public class User : IEntityId<long>
     {
+        /// <summary>
+        /// Id пользователя
+        /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// Логин пользователя
+        /// </summary>
         public string Login { get; set; }
+
+        /// <summary>
+        /// Пароль пользователя
+        /// </summary>
         public string Password { get; set; }
 
-        public UserToken UserToken { get; set; }
-        public List<Report> Reports { get; set; } // прописываем связь Пользователь (1) составляет (:) Монжество отчётов (М) 
-        public List<Role> Role { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        /// <summary>
+        /// Последнее посещение полоьзователя
+        /// </summary>
+        public DateTime? LastLoginDate { get; set; }
 
-        public long CreatedBy { get; set; }
-        public long? UpdatedBy { get; set; }
+        /// <summary>
+        /// Фото пользователя
+        /// </summary>
+        public byte[]? Photo { get; set; }
+
+        /// <summary>
+        /// Токен пользователя
+        /// </summary>
+        public UserToken UserToken { get; set; }
+
+        /// <summary>
+        /// Отчёт пользователя
+        /// </summary>
+        public List<Report> Reports { get; set; }
+
+        /// <summary>
+        /// Роль пользователя
+        /// </summary>
+        public List<Role> Role { get; set; }
+
+        /// <summary>
+        /// Дата создания пользователя
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
     }
 }

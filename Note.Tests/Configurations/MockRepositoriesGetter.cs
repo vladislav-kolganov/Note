@@ -55,17 +55,15 @@ namespace Note.Tests.Configurations
             return new List<User>() {
             new User() {
                 Id = 1,
-                Login = "ITHomester",
+                Login = "lol",
                 Password = "dasdKAJSkdqwej4ej#",
                 CreatedAt = DateTime.Now.AddDays(-2),
-                UpdatedAt = DateTime.Now.AddDays(-2)
             },
             new User() {
                 Id = 2,
                 Login = "Basne",
                 Password = "daskdak@K#K@",
                 CreatedAt = DateTime.Now.AddDays(-2),
-                UpdatedAt = DateTime.Now.AddDays(-2)
             }
         }.AsQueryable();
         }

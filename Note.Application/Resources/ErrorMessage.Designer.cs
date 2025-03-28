@@ -61,6 +61,15 @@ namespace Note.Application.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Чат не найден.
+        /// </summary>
+        internal static string ChatNotFound {
+            get {
+                return ResourceManager.GetString("ChatNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Внтуренняя ошибка сервера.
         /// </summary>
         internal static string InternalServerError {
@@ -84,6 +93,24 @@ namespace Note.Application.Resources {
         internal static string InvalidToken {
             get {
                 return ResourceManager.GetString("InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пустое сообщение.
+        /// </summary>
+        internal static string MessageIsEmpty {
+            get {
+                return ResourceManager.GetString("MessageIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Сообщение не найдено.
+        /// </summary>
+        internal static string MessageNotFound {
+            get {
+                return ResourceManager.GetString("MessageNotFound", resourceCulture);
             }
         }
         

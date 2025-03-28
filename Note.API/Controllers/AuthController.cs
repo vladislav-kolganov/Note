@@ -27,6 +27,7 @@ namespace Note.API.Controllers
         public async  Task<ActionResult<BaseResult<UserDto>>> Register([FromBody]RegisterUserDto dto)
         {
             var response = await _authService.Register(dto);
+
             if (response.IsSuccess)
             { 
             return Ok(response);
@@ -42,6 +43,7 @@ namespace Note.API.Controllers
         public async Task<ActionResult<BaseResult<TokenDto>>> Login([FromBody] LoginUserDto dto)
         {
             var response = await _authService.Login(dto);
+
             if (response.IsSuccess)
             {
                 return Ok(response);

@@ -73,6 +73,7 @@ namespace Note.Application.Services
 
             var accessToken = _tokenService.GenerateAccessToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
+
             if (userToken == null)
             {
                 userToken = new UserToken()
@@ -92,6 +93,10 @@ namespace Note.Application.Services
                 await _userTokenRepository.SaveChangeAsync();
 
             }
+
+            user.LastLoginDate = DateTime.UtcNow;
+           _userRepositoory.Update(user);
+           await _unitOfWork.SaveChangeAsync();
 
             return new BaseResult<TokenDto>()
             {
@@ -114,6 +119,7 @@ namespace Note.Application.Services
                 };
             }
             var user = await _userRepositoory.GetAll().FirstOrDefaultAsync(x => x.Login == dto.Login);
+
             if (user != null)
             {
                 return new BaseResult<UserDto>

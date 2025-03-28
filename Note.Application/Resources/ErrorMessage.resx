@@ -156,4 +156,13 @@
   <data name="UserAlreadyExistsThisRole" xml:space="preserve">
     <value>У пользователя уже есть такая роль</value>
   </data>
+  <data name="ChatNotFound" xml:space="preserve">
+    <value>Чат не найден</value>
+  </data>
+  <data name="MessageNotFound" xml:space="preserve">
+    <value>Сообщение не найдено</value>
+  </data>
+  <data name="MessageIsEmpty" xml:space="preserve">
+    <value>Пустое сообщение</value>
+  </data>
 </root>

@@ -19,9 +19,9 @@ namespace Note.DAL.Configurations
                 .UsingEntity<UserRole>
                 (
                     r => r.HasOne<Role>().WithMany().HasForeignKey(x => x.RoleId),
-                    u => u.HasOne<User>().WithMany().HasForeignKey(x => x.UserId) 
+                    u => u.HasOne<User>().WithMany().HasForeignKey(x => x.UserId)
                 );
-            
+
             builder.HasData(new List<User>()
             {
                 new User()

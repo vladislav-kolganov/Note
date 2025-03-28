@@ -156,4 +156,13 @@
   <data name="UserAlreadyExistsThisRole" xml:space="preserve">
     <value>User already exists this role</value>
   </data>
+  <data name="ChatNotFound" xml:space="preserve">
+    <value>Chat not found</value>
+  </data>
+  <data name="MessageNotFound" xml:space="preserve">
+    <value>Message not found</value>
+  </data>
+  <data name="MessageIsEmpty" xml:space="preserve">
+    <value>MessageIsEmpty</value>
+  </data>
 </root>
