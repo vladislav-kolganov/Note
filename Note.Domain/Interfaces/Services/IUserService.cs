@@ -14,10 +14,24 @@ namespace Note.Domain.Interfaces.Services
     /// </summary>
     public interface IUserService
     {
-        Task<BaseResult<UserDto>> Create(User model);
+        /// <summary>
+        /// Метод создания пользователя
+        /// </summary>
+        /// <param name="model">Модель пользователя</param>
+        Task<BaseResult<UserDto>> Create(RegisterUserDto model);
 
-        Task<BaseResult<UserDto>> Update(User model);
+        /// <summary>
+        /// Метод обновления пользователя
+        /// </summary>
+        /// <param name="model">Модель пользователя</param>
+        /// <returns></returns>
+        Task<BaseResult<UserDto>> Update(UserDto model);
 
+        /// <summary>
+        /// Метод удаления пользователя
+        /// </summary>
+        /// <param name="id">Id пользователя</param>
+        /// <returns></returns>
         Task<BaseResult<UserDto>> Delete(long id);
     }
 }

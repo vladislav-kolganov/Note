@@ -8,7 +8,8 @@ namespace Note.DAL.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
-        public UnitOfWork(ApplicationDbContext context, IBaseRepository<User> users, IBaseRepository<User> roles, IBaseRepository<UserRole> userRoles)
+        public UnitOfWork(ApplicationDbContext context, IBaseRepository<User> users,
+            IBaseRepository<User> roles, IBaseRepository<UserRole> userRoles)
         {
             _context = context;
             Users = users;

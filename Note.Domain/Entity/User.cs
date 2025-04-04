@@ -30,7 +30,7 @@ namespace Note.Domain.Entity
         /// <summary>
         /// Фото пользователя
         /// </summary>
-        public byte[]? Photo { get; set; }
+        public string[]? Photo { get; set; }
 
         /// <summary>
         /// Токен пользователя
@@ -50,6 +50,6 @@ namespace Note.Domain.Entity
         /// <summary>
         /// Дата создания пользователя
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

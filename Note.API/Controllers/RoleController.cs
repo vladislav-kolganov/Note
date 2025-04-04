@@ -7,7 +7,8 @@ using Note.Domain.Result;
 using System.Net.Mime;
 
 namespace Note.API.Controllers
-{   /// <summary>
+{  
+ /// <summary>
 /// Контроллер для добавления ролей
 /// </summary>
     [Consumes(MediaTypeNames.Application.Json)]

@@ -6,6 +6,7 @@
         ReportNotFound = 1,
         ReportAlreadyExists = 2,
 
+        InvalidClientRequest = 9,
         InternalServerError = 10,
 
         UserNotFound = 11,

@@ -97,6 +97,7 @@ namespace Note.Application.Services
                 UserId = dto.UserId
             };
             await _reportRepository.CreateAsync(report);
+            await _reportRepository.SaveChangeAsync();
 
             return new BaseResult<ReportDto>()
             {
@@ -106,10 +107,16 @@ namespace Note.Application.Services
 
         }
 
+        /// <summary>
+        /// Эндпоинт удаления отчёта
+        /// </summary>
+        /// <param name="id">Id отчёта</param>
+        /// <returns>Дто удаленного отчёта</returns>
         public async Task<BaseResult<ReportDto>> DeleteReportAsync(long id)
         {
             var report = await _reportRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
             var result = _reportValidator.ValidateOnNull(report);
+
             if (!result.IsSuccess)
             {
                 return new BaseResult<ReportDto>()
@@ -120,6 +127,7 @@ namespace Note.Application.Services
             }
             _reportRepository.Remove(report);
             await _reportRepository.SaveChangeAsync();
+
             return new BaseResult<ReportDto>()
             {
                 Data = _mappper.Map<ReportDto>(report)
@@ -130,6 +138,7 @@ namespace Note.Application.Services
         {
             var report = await _reportRepository.GetAll().FirstOrDefaultAsync(x => x.Id == dto.Id);
             var result = _reportValidator.ValidateOnNull(report);
+
             if (!result.IsSuccess)
             {
                 return new BaseResult<ReportDto>()
@@ -138,8 +147,10 @@ namespace Note.Application.Services
                     ErrorCode = result.ErrorCode
                 };
             }
+
             report.Name = dto.Name;
             report.Description = dto.Description;
+
             var updatedReport = _reportRepository.Update(report);
             await _reportRepository.SaveChangeAsync();
 

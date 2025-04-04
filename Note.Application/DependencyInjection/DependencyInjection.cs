@@ -27,6 +27,8 @@ namespace Note.Application.DependencyInjection
             services.AddScoped<IRoleService, RoleServices>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddTransient<IChatService, ChatService>();
+            services.AddTransient<IUserService, UserService>();
         }
 
         public static void InitFluentValidation(this IServiceCollection services)

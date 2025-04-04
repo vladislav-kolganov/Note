@@ -28,7 +28,7 @@ namespace Note.API
             }).AddJwtBearer(op => 
             
                 {
-                    var options = builder.Configuration.GetSection(JwtSettings.DefaultSection).Get<JwtSettings>();       
+                    var options = builder.Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();       
                     var jwtKey = options.JwtKey;
                     var issuer = options.Issuer;
                     var audience = options.Audience;

@@ -9,7 +9,7 @@ namespace Note.API.Controllers
 {
     //[Authorize]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")] // путь до контроллера
+    [Route("[controller]")] // путь до контроллера
     [ApiController]
     public class ReportController : ControllerBase
     {
@@ -19,6 +19,10 @@ namespace Note.API.Controllers
             _reportService = reportService;
         }
 
+        /// <summary>
+        /// Получение отчёта по Id
+        /// </summary>
+        /// <param name="id">Id отчёта</param>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -32,10 +36,14 @@ namespace Note.API.Controllers
             return BadRequest(response);
         }
 
+        /// <summary>
+        /// Получение получения отчётов пользователя по Id пользователя
+        /// </summary>
+        /// <param name="userId">Id пользователя</param>
         [HttpGet("reports/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<BaseResult<ReportDto>>> GetUserReports(long userId)
+        public async Task<ActionResult<CollectionResult<ReportDto>>> GetUserReports(long userId)
         {
             var response = await _reportService.GetResultAsync(userId);
             if (response.IsSuccess)
@@ -45,6 +53,11 @@ namespace Note.API.Controllers
             return BadRequest(response);
         }
 
+        /// <summary>
+        /// Удаление отчёта по
+        /// </summary>
+        /// <param name="reportId"></param>
+        /// <returns></returns>
         [HttpDelete("{reportId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

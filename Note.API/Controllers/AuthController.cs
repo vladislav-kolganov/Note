@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Note.Domain.Dto;
 using Note.Domain.Dto.UserDto;
 using Note.Domain.Interfaces.Services;
@@ -10,9 +11,11 @@ namespace Note.API.Controllers
     /// Контроллер для регистрации и логина
     /// </summary>
     [ApiController]
+  //[Authorize(Roles="admin, moderator")]
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
+
         public AuthController(IAuthService authService)
         {
             _authService = authService;
@@ -21,24 +24,23 @@ namespace Note.API.Controllers
         /// <summary>
         /// Контроллер регистрации пользователя
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
+        /// <param name="dto">dto регистрации юзера</param>
         [HttpPost("register")]
-        public async  Task<ActionResult<BaseResult<UserDto>>> Register([FromBody]RegisterUserDto dto)
+        public async Task<ActionResult<BaseResult<UserDto>>> Register([FromBody]RegisterUserDto dto)
         {
             var response = await _authService.Register(dto);
 
             if (response.IsSuccess)
             { 
-            return Ok(response);
+              return Ok(response);
             }
+
             return BadRequest(response);
         }
         /// <summary>
         /// Контроллер для логина пользователя
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
+        /// <param name="dto">dto логина юзера</param>
         [HttpPost("login")]
         public async Task<ActionResult<BaseResult<TokenDto>>> Login([FromBody] LoginUserDto dto)
         {

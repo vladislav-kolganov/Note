@@ -1,0 +1,23 @@
+services:
+  note.api:
+    image: ${DOCKER_REGISTRY-}noteapi
+    build:
+      context: .
+      dockerfile: Note.API/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - db
+    environment:
+      - "PostgresSettings__ConnectionString=Host=db;Port=5432;Database=chat;Username=admin;Password=admin"
+      - "PostgresSettings__Schema=chat"
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: chat
+    ports:
+      - "5432:5432"
