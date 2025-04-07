@@ -13,16 +13,16 @@ namespace Note.API.Controllers
 /// </summary>
     [Consumes(MediaTypeNames.Application.Json)]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
-
 
         public RoleController(IRoleService roleService)
         {
             _roleService = roleService;
         }
+
         /// <summary>
         /// Метод в контроллере ролей для создания ролей
         /// </summary>
@@ -40,6 +40,7 @@ namespace Note.API.Controllers
             }
             return BadRequest(response);
         }
+
         /// <summary>
         /// Метод в контроллере ролей для обновления ролей
         /// </summary>
@@ -57,6 +58,7 @@ namespace Note.API.Controllers
             }
             return BadRequest(response);
         }
+
         /// <summary>
         /// Метод в контроллере ролей для удаления ролей
         /// </summary>
@@ -74,6 +76,7 @@ namespace Note.API.Controllers
             }
             return BadRequest(response);
         }
+
         /// <summary>
         /// Метод добавления роли пользователю
         /// </summary>

@@ -90,11 +90,16 @@ namespace Note.Application.Services
               Data = message
             };
         }
-
-        public async Task<BaseResult<bool>> DeleteChat(long chatId, long userId)
+        
+        /// <summary>
+        /// Удаление чата пользователя
+        /// </summary>
+        /// <param name="chatId">Id чата </param>
+        /// <param name="userId">Id пользователя</param>
+        public async Task<BaseResult<bool>> DeleteChat(long chatId)
         {
             var chat = await _chatRepository.GetAll()
-                .FirstOrDefaultAsync(x => (x.User1 == userId || x.User2 == userId) && x.Id == chatId);
+                .FirstOrDefaultAsync(x => x.Id == chatId);
 
             if (chat == null)
             {

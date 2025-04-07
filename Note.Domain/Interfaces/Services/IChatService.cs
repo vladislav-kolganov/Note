@@ -37,8 +37,7 @@ namespace Note.Domain.Interfaces.Services
         /// Удаление чата
         /// </summary>
         /// <param name="chatId">id чата</param>
-        /// <param name="userId">id пользователя</param>
-        Task<BaseResult<bool>> DeleteChat(long chatId, long userId);
+        Task<BaseResult<bool>> DeleteChat(long chatId);
 
         /// <summary>
         /// Редактирование сообщения

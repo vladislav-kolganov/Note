@@ -53,34 +53,34 @@ namespace Note.API
         /// <param name="services"></param>
         public static void AddSwagger(this IServiceCollection services)
         {
-            services.AddApiVersioning()
-            .AddApiExplorer(options =>
-            {
-                options.DefaultApiVersion = new ApiVersion(1, 0);
-                options.GroupNameFormat = "'v'VVV";
-                options.SubstituteApiVersionInUrl = true;
-                options.AssumeDefaultVersionWhenUnspecified = true; // если не задаётся версия, то используется по умолчанию
-            });
+            //services.AddApiVersioning()
+            //.AddApiExplorer(options =>
+            //{
+            //    options.DefaultApiVersion = new ApiVersion(1, 0);
+            //    options.GroupNameFormat = "'v'VVV";
+            //    options.SubstituteApiVersionInUrl = true;
+            //    options.AssumeDefaultVersionWhenUnspecified = true; // если не задаётся версия, то используется по умолчанию
+            //});
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo()
-                {
+                //options.SwaggerDoc("v1", new OpenApiInfo()
+                //{
 
-                    Version = "v1",
-                    Title = "Note.API",
-                    Description = "This is version 1.0"
+                //    Version = "v1",
+                //    Title = "Note.API",
+                //    Description = "This is version 1.0"
 
-                });
+                //});
 
-                options.SwaggerDoc("v2", new OpenApiInfo()
-                {
+                //options.SwaggerDoc("v2", new OpenApiInfo()
+                //{
 
-                    Version = "v2",
-                    Title = "Note.API",
-                    Description = "This is version 2.0"
+                //    Version = "v2",
+                //    Title = "Note.API",
+                //    Description = "This is version 2.0"
 
-                });
+                //});
 
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
