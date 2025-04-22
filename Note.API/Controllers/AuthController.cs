@@ -25,7 +25,7 @@ namespace Note.API.Controllers
         /// Контроллер регистрации пользователя
         /// </summary>
         /// <param name="dto">dto регистрации юзера</param>
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public async Task<ActionResult<BaseResult<UserDto>>> Register([FromBody]RegisterUserDto dto)
         {
             var response = await _authService.Register(dto);
@@ -41,7 +41,7 @@ namespace Note.API.Controllers
         /// Контроллер для логина пользователя
         /// </summary>
         /// <param name="dto">dto логина юзера</param>
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<BaseResult<TokenDto>>> Login([FromBody] LoginUserDto dto)
         {
             var response = await _authService.Login(dto);

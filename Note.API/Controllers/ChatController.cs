@@ -40,7 +40,7 @@ namespace Note.API.Controllers
         /// <summary>
         /// Метод получения последнего сообщения
         /// </summary>
-        /// <param name="chatId"> Id чата</param>
+        /// <param name="chatId">Id чата</param>
         [HttpGet("GetLastMessage/{chatId}")]
         public async Task<ActionResult<BaseResult<Chat>>> GetLastMessage(long chatId)
         {
@@ -57,7 +57,7 @@ namespace Note.API.Controllers
         /// <summary>
         /// Метод получения сообщения
         /// </summary>
-        /// <param name="chatId"> Id чата</param>
+        /// <param name="chatId">Id чата</param>
         [HttpGet("GetMessages/{chatId}")]
         public async Task<ActionResult<CollectionResult<Chat>>> GetMessages(long chatId)
         {
@@ -75,7 +75,7 @@ namespace Note.API.Controllers
         /// <summary>
         /// Метод удаления чата у пользователя
         /// </summary>
-        /// <param name="chatId"></param>
+        /// <param name="chatId">Id чата</param>
         [HttpGet("DeleteChat/{chatId}")]
         public async Task<ActionResult<BaseResult<Message>>> DeleteChat(long chatId)
         {

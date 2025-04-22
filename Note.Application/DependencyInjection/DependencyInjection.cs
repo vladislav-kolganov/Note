@@ -14,8 +14,11 @@ namespace Note.Application.DependencyInjection
     {
         public static void AddApplication(this IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(ReportMapping));
-            services.AddAutoMapper(typeof(UserMapping));
+            services.AddAutoMapper(typeof(ReportMapping),
+                typeof(UserMapping),
+                typeof(RoleMapping));
+;
+
             InitServices(services);
 
             InitFluentValidation(services);
