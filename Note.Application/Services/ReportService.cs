@@ -14,7 +14,6 @@ namespace Note.Application.Services
 {
     public class ReportService : IReportService
     {
-        // Сервисы - прослойка между API и DB
         private readonly IBaseRepository<Report> _reportRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IReportValidator _reportValidator;
@@ -75,6 +74,12 @@ namespace Note.Application.Services
                 Data = report
             };
         }
+        
+        /// <summary>
+        /// Создание отчёта
+        /// </summary>
+        /// <param name="dto">Дто с информацией для создания отчёта</param>
+        /// <returns>Дто созданного отчёта</returns>
         public async Task<BaseResult<ReportDto>> CreateReportAsync(CreateReportDto dto)
         {
             var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == dto.UserId);
@@ -134,6 +139,11 @@ namespace Note.Application.Services
             };
         }
 
+        /// <summary>
+        /// Обновление отчёта.
+        /// </summary>
+        /// <param name="dto"> Дто с обновлениями</param>
+        /// <returns>Дто обновленного отчёта.</returns>
         public async Task<BaseResult<ReportDto>> UpdateReportAsync(UpdateReportDto dto)
         {
             var report = await _reportRepository.GetAll().FirstOrDefaultAsync(x => x.Id == dto.Id);

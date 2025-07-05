@@ -39,8 +39,8 @@ namespace Note.DAL.DependencyInjection
         private static IServiceCollection AddSettings(this IServiceCollection services,
         IConfiguration configuration)
         {
-            services.Configure<PostgresSettings>(configuration.GetSection(nameof(PostgresSettings)));
-            services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
+            services.Configure<PostgresSettings>( x => configuration.GetSection(nameof(PostgresSettings)));
+            services.Configure<JwtSettings>(x => configuration.GetSection(nameof(JwtSettings)));
 
             return services;
         }
