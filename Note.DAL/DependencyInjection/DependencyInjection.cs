@@ -5,9 +5,12 @@ using Note.DAL.Repositories;
 using Note.Domain.Entity;
 using Note.Domain.Entity.ChatEntity;
 using Note.Domain.Interfaces.Database;
+using Note.Domain.Interfaces.External;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Settings;
 using Note.Domain.Settings.DbSettings;
+using Refit;
+using System.Text.Json;
 
 namespace Note.DAL.DependencyInjection
 {
@@ -18,6 +21,8 @@ namespace Note.DAL.DependencyInjection
             services.AddSettings(configuration);
 
             services.AddDbContext();
+
+            services.AddRefit(configuration);
 
             services.AddSingleton<DateInterceptor>();
 
@@ -39,14 +44,41 @@ namespace Note.DAL.DependencyInjection
         private static IServiceCollection AddSettings(this IServiceCollection services,
         IConfiguration configuration)
         {
-            services.Configure<PostgresSettings>( x => configuration.GetSection(nameof(PostgresSettings)));
-            services.Configure<JwtSettings>(x => configuration.GetSection(nameof(JwtSettings)));
+            services.Configure<PostgresSettings>(settings => configuration.GetSection(nameof(PostgresSettings)));
+            services.Configure<JwtSettings>(settings => configuration.GetSection(nameof(JwtSettings)));
 
             return services;
         }
+
         public static IServiceCollection AddDbContext(this IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddRefit(this IServiceCollection services,
+        IConfiguration configuration)
+        {
+            var config = configuration.GetSection(nameof(ApiPythonConfig)).Get<ApiPythonConfig>() ??
+                throw new NullReferenceException(nameof(ApiPythonConfig) + " is null");
+
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = true
+            };
+
+            var refitSettings = new RefitSettings
+            {
+                ContentSerializer = new SystemTextJsonContentSerializer(jsonOptions)
+            };
+
+            services.AddRefitClient<IFirePrediction>(refitSettings).
+            ConfigureHttpClient(client =>
+            {
+                client.BaseAddress = new Uri($"{config.UrlApi}");
+            });
 
             return services;
         }

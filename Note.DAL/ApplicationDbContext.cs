@@ -16,28 +16,22 @@ namespace Note.DAL
             _postgresSettings = postgresSettings.Value;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) // DbContextOptionsBuilder optionsBuilder: Параметр, который предоставляет API для настройки DbContext.                                          // С помощью него можно добавлять различные параметры конфигурации.
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseNpgsql(_postgresSettings.ConnectionString, npgsqlOptions =>
             {
-                    // Указываем сборку, в которой лежат миграции
-                    npgsqlOptions.MigrationsAssembly("Note.DAL");
+                npgsqlOptions.MigrationsAssembly("Note.DAL");
             });
-
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             optionsBuilder.AddInterceptors(new DateInterceptor(httpContextAccessor));
 
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
-
-            // Обычно здесь можно добавлять настройки для подключения к базе данных (например, строку подключения).
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
-
-
     }
 }
