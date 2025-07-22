@@ -8,12 +8,6 @@ using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Note.Application.Services
 {
@@ -28,8 +22,12 @@ namespace Note.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public UserService(IBaseRepository<User> userRepository, IBaseRepository<UserRole> userRoleService,
-            IAuthService authService, IUnitOfWork unitOfWork, IMapper mapper)
+        public UserService(
+            IBaseRepository<User> userRepository,
+            IBaseRepository<UserRole> userRoleService,
+            IAuthService authService,
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
         {
             _userRepository = userRepository;
             _userRoleRepository = userRoleService;
@@ -53,7 +51,8 @@ namespace Note.Application.Services
                 };
             }
 
-            var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Login == model.Login);
+            var user = await _userRepository.GetAll().
+                FirstOrDefaultAsync(x => x.Login == model.Login);
 
             if (user != null)
             {
@@ -66,9 +65,9 @@ namespace Note.Application.Services
 
             return await _authService.Register(new RegisterUserDto
                 (
-                  Login : model.Login,
-                  Password : model.Password,
-                  PasswordConfirm : model.PasswordConfirm,
+                  Login: model.Login,
+                  Password: model.Password,
+                  PasswordConfirm: model.PasswordConfirm,
                   Photo: model.Photo)
                );
 
@@ -153,7 +152,7 @@ namespace Note.Application.Services
             }
 
             var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Login == model.Login);
-            
+
             if (user == null)
             {
                 return new BaseResult<UserDto>
@@ -162,7 +161,7 @@ namespace Note.Application.Services
                     ErrorCode = (int)ErrorCodes.UserNotFound
                 };
             }
-            
+
             _userRepository.Update(user);
             await _unitOfWork.SaveChangeAsync();
 

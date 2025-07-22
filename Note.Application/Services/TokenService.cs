@@ -1,4 +1,4 @@
-﻿    using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Note.Application.Resources;
@@ -35,7 +35,7 @@ namespace Note.Application.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
 
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            
+
             var securityToken =
                 new JwtSecurityToken(_issuer, _audience, claims, null, DateTime.UtcNow.AddMinutes(10), credentials);
 
@@ -95,12 +95,12 @@ namespace Note.Application.Services
 
             user.UserToken.RefreshToken = newRefreshToken;
 
-           _userRepository.Update(user);
+            _userRepository.Update(user);
             await _userRepository.SaveChangeAsync();
 
             return new BaseResult<TokenDto>()
             {
-                Data = new TokenDto() 
+                Data = new TokenDto()
                 {
                     AccessToken = newAccessToken,
                     RefreshToken = newRefreshToken

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
 using Note.Domain.Dto;
 using Note.Domain.Dto.UserDto;
@@ -9,7 +10,6 @@ using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
-using Serilog;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,13 +23,19 @@ namespace Note.Application.Services
         private readonly IBaseRepository<UserToken> _userTokenRepository;
         private readonly IBaseRepository<Role> _roleRepository;
         private readonly IBaseRepository<UserRole> _userRoleRepository;
-        private readonly ILogger _logger;
+        private readonly ILogger<AuthService> _logger;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
-        public AuthService(IBaseRepository<User> userRepositoory, ILogger logger, IMapper mapper,
-            IBaseRepository<UserToken> userTokenRepository, ITokenService tokenService, IBaseRepository<Role> roleRepository,
-            IBaseRepository<UserRole> userRoleRepository, IUnitOfWork unitOfWork)
+        public AuthService(
+            IBaseRepository<User> userRepositoory,
+            ILogger<AuthService> logger, 
+            IMapper mapper,
+            IBaseRepository<UserToken> userTokenRepository,
+            ITokenService tokenService,
+            IBaseRepository<Role> roleRepository,
+            IBaseRepository<UserRole> userRoleRepository,
+            IUnitOfWork unitOfWork)
         {
             _userRepositoory = userRepositoory;
             _logger = logger;
@@ -40,6 +46,7 @@ namespace Note.Application.Services
             _userRoleRepository = userRoleRepository;
             _unitOfWork = unitOfWork;
         }
+
         public async Task<BaseResult<TokenDto>> Login(LoginUserDto dto)
         {
             var user = await _userRepositoory.GetAll()
@@ -91,7 +98,6 @@ namespace Note.Application.Services
                 userToken.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
                 _userTokenRepository.Update(userToken);
                 await _userTokenRepository.SaveChangeAsync();
-
             }
 
             user.LastLoginDate = DateTime.UtcNow;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Note.Application.Resources;
+using Note.Application.Services.Extensions;
 using Note.Domain.Entity;
 using Note.Domain.Entity.ChatEntity;
 using Note.Domain.Enum;
@@ -18,7 +19,10 @@ namespace Note.Application.Services
         private readonly IBaseRepository<Message> _messageRepository;
 
 
-        public ChatService(IUnitOfWork unitOfWork, IBaseRepository<User> userRepositoory, IBaseRepository<Chat> chatRepositoory,
+        public ChatService(
+            IUnitOfWork unitOfWork,
+            IBaseRepository<User> userRepositoory,
+            IBaseRepository<Chat> chatRepositoory,
             IBaseRepository<Message> messageRepositoory)
         {
             _unitOfWork = unitOfWork;
@@ -27,7 +31,23 @@ namespace Note.Application.Services
             _messageRepository = messageRepositoory;
         }
 
-        public async Task<BaseResult<Message>> CreateMessage(long chatId, long producerMessageId, long consumerMessageId, string? textMessage, List<byte[]>? photo)
+        /// <summary>
+        /// Создать сообщение.
+        /// </summary>
+        /// <param name="chatId">Id чата.</param>
+        /// <param name="producerMessageId">Id отправителя сообщения.</param>
+        /// <param name="consumerMessageId">Id получателя сообщения.</param>
+        /// <param name="textMessage">Текст сообщения.</param>
+        /// <param name="photo">Фото сообщения.</param>
+        /// <returns></returns>
+        public async Task<BaseResult<Message>> CreateMessage
+        (
+         long chatId,
+         long producerMessageId,
+         long consumerMessageId,
+         string? textMessage,
+         List<byte[]>? photo
+        )
         {
 
             if (textMessage == null && photo == null)
@@ -61,7 +81,7 @@ namespace Note.Application.Services
 
             if (chat == null)
             {
-                 chat = new Chat()
+                chat = new Chat()
                 {
                     User1 = producerMessageId,
                     User2 = consumerMessageId,
@@ -87,10 +107,10 @@ namespace Note.Application.Services
 
             return new BaseResult<Message>()
             {
-              Data = message
+                Data = message
             };
         }
-        
+
         /// <summary>
         /// Удаление чата пользователя
         /// </summary>
@@ -121,10 +141,14 @@ namespace Note.Application.Services
 
         public async Task<BaseResult<Message>> EditMessage(long messageId, string textMessage)
         {
-            var message = await _messageRepository.GetAll().FirstOrDefaultAsync(x => x.Id == messageId);
+            var message = await _messageRepository.GetAll().
+                FirstOrDefaultAsync(x => x.Id == messageId);
 
-            if (message != null && textMessage != "")
+            if (message != null && textMessage.IsNullOrWhiteSpace())
             {
+                message.UpdatedAt = DateTime.UtcNow;
+                message.TextMessage = textMessage;
+
                 _messageRepository.Update(message);
                 await _unitOfWork.SaveChangeAsync();
 
@@ -147,14 +171,13 @@ namespace Note.Application.Services
                 .Where(x => x.User1 == userId || x.User2 == userId)
                 .ToArrayAsync();
 
-            if (!chats.Any())
+            if (!chats.IsNotNullOrEmpty())
             {
                 return new CollectionResult<Chat>()
                 {
                     ErrorMessage = ErrorMessage.ChatNotFound,
                     ErrorCode = (int)ErrorChatCodes.ChatNotFound
                 };
-
             }
 
             return new CollectionResult<Chat>()
@@ -166,7 +189,9 @@ namespace Note.Application.Services
 
         public async Task<BaseResult<Message>> GetLastMessage(long chatId)
         {
-            var lastMessage = await _messageRepository.GetAll().Where(x => x.ChatId == chatId).LastOrDefaultAsync();
+            var lastMessage = await _messageRepository.GetAll().
+                Where(x => x.ChatId == chatId).
+                LastOrDefaultAsync();
 
             if (lastMessage != null)
             {
@@ -186,9 +211,9 @@ namespace Note.Application.Services
         public async Task<CollectionResult<Message>> GetMessages(long chatId)
         {
             Message[] messages = await _messageRepository.GetAll()
-                .Where(x => x.ChatId == chatId).ToArrayAsync();
+                     .Where(x => x.ChatId == chatId).ToArrayAsync();
 
-            if (!messages.Any())
+            if (!messages.IsNotNullOrEmpty())
             {
                 return new CollectionResult<Message>()
                 {

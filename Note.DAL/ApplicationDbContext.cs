@@ -1,37 +1,43 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Note.DAL.Interceptors;
+using Note.Domain.Settings;
 using Note.Domain.Settings.DbSettings;
-using System.Reflection;
 
 namespace Note.DAL
 {
     public class ApplicationDbContext : DbContext
     {
-        private readonly PostgresSettings _postgresSettings;
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IOptions<PostgresSettings> postgresSettings) : base(options)
+        private readonly IConfiguration _configuration;
+
+        public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options, IConfiguration configuration) : base(options)
         {
-            _postgresSettings = postgresSettings.Value;
+            _configuration = configuration;
+        }
+
+        public ApplicationDbContext()
+        {
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(_postgresSettings.ConnectionString, npgsqlOptions =>
+            var config = _configuration.GetSection(nameof(PostgresSettings)).Get<PostgresSettings>() ??
+                throw new ArgumentNullException(nameof(ApiPythonSettings) + " is null");
+
+            optionsBuilder.UseNpgsql(config.ConnectionString);
+
+            if (optionsBuilder.IsConfigured)
             {
-                npgsqlOptions.MigrationsAssembly("Note.DAL");
-            });
-
-            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
-            optionsBuilder.AddInterceptors(new DateInterceptor(httpContextAccessor));
-
-            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+                var httpContextAccessor = new HttpContextAccessor();
+                optionsBuilder.AddInterceptors(new DateInterceptor(httpContextAccessor));
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
     }
 }

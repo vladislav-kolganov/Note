@@ -8,6 +8,7 @@ using Note.Domain.Result;
 namespace Note.API.Controllers
 {
     //[Authorize]
+    [AllowAnonymous]
     [ApiVersion("1.0")]
     [Route("[controller]")] // путь до контроллера
     [ApiController]

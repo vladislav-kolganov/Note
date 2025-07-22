@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Note.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class MyMigration : Migration
+    public partial class InitMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -170,8 +170,8 @@ namespace Note.DAL.Migrations
                 columns: new[] { "Id", "CreatedAt", "LastLoginDate", "Login", "Password", "Photo" },
                 values: new object[,]
                 {
-                    { 1L, new DateTime(2025, 4, 4, 19, 42, 53, 432, DateTimeKind.Utc).AddTicks(2641), null, "Bob", "1221", null },
-                    { 2L, new DateTime(2025, 4, 4, 19, 42, 53, 432, DateTimeKind.Utc).AddTicks(2647), null, "user2", "1221", null }
+                    { 1L, new DateTime(2025, 7, 20, 17, 7, 23, 42, DateTimeKind.Utc).AddTicks(9396), null, "Bob", "1221", null },
+                    { 2L, new DateTime(2025, 7, 20, 17, 7, 23, 42, DateTimeKind.Utc).AddTicks(9409), null, "user2", "1221", null }
                 });
 
             migrationBuilder.InsertData(
@@ -179,8 +179,8 @@ namespace Note.DAL.Migrations
                 columns: new[] { "Id", "CreatedAt", "CreatedBy", "Description", "Name", "UpdatedAt", "UpdatedBy", "UserId" },
                 values: new object[,]
                 {
-                    { 1L, new DateTime(2025, 4, 4, 19, 42, 53, 429, DateTimeKind.Utc).AddTicks(8094), 0L, "tesrjigbejrfhibugehjrfiu", "testname1", null, null, 1L },
-                    { 2L, new DateTime(2025, 4, 4, 19, 42, 53, 429, DateTimeKind.Utc).AddTicks(8098), 0L, "fvddfgvdfvfvddfvvfd", "testname2", null, null, 2L }
+                    { 1L, new DateTime(2025, 7, 20, 17, 7, 23, 40, DateTimeKind.Utc).AddTicks(2463), 0L, "tesrjigbejrfhibugehjrfiu", "testname1", null, null, 1L },
+                    { 2L, new DateTime(2025, 7, 20, 17, 7, 23, 40, DateTimeKind.Utc).AddTicks(2468), 0L, "fvddfgvdfvfvddfvvfd", "testname2", null, null, 2L }
                 });
 
             migrationBuilder.InsertData(
@@ -191,7 +191,7 @@ namespace Note.DAL.Migrations
             migrationBuilder.InsertData(
                 table: "UserToken",
                 columns: new[] { "Id", "RefreshToken", "RefreshTokenExpiryTime", "UserId" },
-                values: new object[] { 1L, "FRrgnjkfgnkfng2323nkrtrgb", new DateTime(2025, 4, 11, 19, 42, 53, 432, DateTimeKind.Utc).AddTicks(7245), 1L });
+                values: new object[] { 1L, "FRrgnjkfgnkfng2323nkrtrgb", new DateTime(2025, 7, 27, 17, 7, 23, 43, DateTimeKind.Utc).AddTicks(4780), 1L });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Message_ChatId",

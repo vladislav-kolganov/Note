@@ -8,7 +8,6 @@ using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.External;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Settings;
-using Note.Domain.Settings.DbSettings;
 using Refit;
 using System.Text.Json;
 
@@ -20,7 +19,9 @@ namespace Note.DAL.DependencyInjection
         {
             services.AddSettings(configuration);
 
-            services.AddDbContext();
+            services.AddDbContext<ApplicationDbContext>();
+
+            //services.AddSerilog(configuration);
 
             services.AddRefit(configuration);
 
@@ -44,15 +45,7 @@ namespace Note.DAL.DependencyInjection
         private static IServiceCollection AddSettings(this IServiceCollection services,
         IConfiguration configuration)
         {
-            services.Configure<PostgresSettings>(settings => configuration.GetSection(nameof(PostgresSettings)));
             services.Configure<JwtSettings>(settings => configuration.GetSection(nameof(JwtSettings)));
-
-            return services;
-        }
-
-        public static IServiceCollection AddDbContext(this IServiceCollection services)
-        {
-            services.AddDbContext<ApplicationDbContext>();
 
             return services;
         }
@@ -60,8 +53,8 @@ namespace Note.DAL.DependencyInjection
         public static IServiceCollection AddRefit(this IServiceCollection services,
         IConfiguration configuration)
         {
-            var config = configuration.GetSection(nameof(ApiPythonConfig)).Get<ApiPythonConfig>() ??
-                throw new NullReferenceException(nameof(ApiPythonConfig) + " is null");
+            var config = configuration.GetSection(nameof(ApiPythonSettings)).Get<ApiPythonSettings>() ??
+                throw new NullReferenceException(nameof(ApiPythonSettings) + " is null");
 
             var jsonOptions = new JsonSerializerOptions
             {

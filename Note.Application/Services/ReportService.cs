@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
 using Note.Domain.Dto.ReportDto;
 using Note.Domain.Entity;
@@ -18,9 +19,14 @@ namespace Note.Application.Services
         private readonly IBaseRepository<User> _userRepository;
         private readonly IReportValidator _reportValidator;
         private readonly IMapper _mappper;
-        private readonly ILogger _logger;
+        private readonly ILogger<ReportService> _logger;
 
-        public ReportService(IBaseRepository<Report> reportRepository, IBaseRepository<User> userRepository, IReportValidator reportValidator, ILogger logger, IMapper mapper)
+        public ReportService(
+            IBaseRepository<Report> reportRepository,
+            IBaseRepository<User> userRepository,
+            IReportValidator reportValidator,
+            ILogger<ReportService> logger,
+            IMapper mapper)
         {
             _reportRepository = reportRepository;
             _userRepository = userRepository;
@@ -39,13 +45,15 @@ namespace Note.Application.Services
 
             if (!reports.Any())
             {
-                _logger.Warning(ErrorMessage.ReportsNotFound, reports.Length);
+                _logger.LogWarning(ErrorMessage.ReportsNotFound, reports.Length);
+
                 return new CollectionResult<ReportDto>()
                 {
                     ErrorMessage = ErrorMessage.ReportsNotFound,
                     ErrorCode = (int)ErrorCodes.ReportsNotFound
                 };
             }
+
             return new CollectionResult<ReportDto>
             {
                 Data = reports,
@@ -53,6 +61,7 @@ namespace Note.Application.Services
             };
 
         }
+
         public async Task<BaseResult<ReportDto>> GetReportAsync(long id)
         {
             ReportDto? report;
@@ -62,7 +71,8 @@ namespace Note.Application.Services
                     .FirstOrDefaultAsync();
             if (report == null)
             {
-                _logger.Warning($"Отчёт с таким {id} не найден", id);
+                _logger.LogWarning($"Отчёт с таким {id} не найден", id);
+
                 return new BaseResult<ReportDto>()
                 {
                     ErrorMessage = ErrorMessage.ReportNotFound,
@@ -74,7 +84,7 @@ namespace Note.Application.Services
                 Data = report
             };
         }
-        
+
         /// <summary>
         /// Создание отчёта
         /// </summary>
@@ -168,7 +178,6 @@ namespace Note.Application.Services
             {
                 Data = _mappper.Map<ReportDto>(updatedReport)
             };
-
         }
     }
 }

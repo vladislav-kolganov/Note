@@ -2,7 +2,6 @@ using Note.API;
 using Note.API.Middlewares;
 using Note.Application.DependencyInjection;
 using Note.DAL.DependencyInjection;
-using Note.Domain.Settings;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,17 +13,19 @@ builder.Services.AddSwagger();
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Host.UseSerilog((context, configuration) =>
-configuration.ReadFrom.Configuration(context.Configuration)); // берем конфигурацию из нашего appsettings.json
+builder.Services.AddDataAccessLayer(builder.Configuration);
 
-builder.Services.AddDataAccessLayer(builder.Configuration); // регистрирование и добавление всех в зависимостей в слое DAL
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+});
+
 builder.Services.AddApplication();
 
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

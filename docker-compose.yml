@@ -5,13 +5,17 @@ services:
       context: .
       dockerfile: Note.API/Dockerfile
     ports:
-      - "8080:8080"
+      - "5433:5433"
       - "8081:8081"
     depends_on:
       - db
+      - mongo
     environment:
       - "PostgresSettings__ConnectionString=Host=db;Port=5432;Database=chat;Username=admin;Password=admin"
       - "PostgresSettings__Schema=chat"
+      - "ConnectionStrings__Mongo=mongodb://user:password@mongo:27017"
+      - "MongoDbSettings__Database=logs"
+      - "MongoDbSettings__Collection=app_logs"
 
   db:
     image: postgres:15-alpine
@@ -21,3 +25,11 @@ services:
       POSTGRES_DB: chat
     ports:
       - "5432:5432"
+
+  mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports: 
+    - "27017:27017"

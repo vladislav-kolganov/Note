@@ -1,9 +1,4 @@
 ﻿using Note.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Note.Domain.Entity.ChatEntity
 {
@@ -15,7 +10,7 @@ namespace Note.Domain.Entity.ChatEntity
         /// <summary>
         /// Id сообщения
         /// </summary>
-        public long Id { get ; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// Текст сообщения
@@ -25,7 +20,7 @@ namespace Note.Domain.Entity.ChatEntity
         /// <summary>
         /// Поддержка фотографий в сообщении
         /// </summary>
-        public List<byte[] >? Photo { get; set; }
+        public List<byte[]>? Photo { get; set; }
 
         /// <summary>
         /// Id пользователя, который отправил сообщение

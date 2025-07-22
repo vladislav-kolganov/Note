@@ -1,15 +1,15 @@
-﻿using Note.Domain.Enum;
-using Note.Domain.Result;
+﻿using Note.Domain.Result;
 using System.Diagnostics;
 using System.Net;
+
 namespace Note.API.Middlewares
 {
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly Serilog.ILogger _logger;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, Serilog.ILogger logger)
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
             _logger = logger;
@@ -31,7 +31,7 @@ namespace Note.API.Middlewares
 
         private async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
         {
-            _logger.Error(exception, exception.Message);
+            _logger.LogWarning(exception, exception.Message);
 
             var errorMessage = exception.Message;
             var response = exception switch
@@ -42,6 +42,7 @@ namespace Note.API.Middlewares
 
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = (int)response.ErrorCode;
+
             await httpContext.Response.WriteAsJsonAsync(response);
         }
     }

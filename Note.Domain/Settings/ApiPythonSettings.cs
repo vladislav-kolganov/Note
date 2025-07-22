@@ -1,6 +1,6 @@
 ﻿namespace Note.Domain.Settings
 {
-    public class ApiPythonConfig
+    public class ApiPythonSettings
     {
         public required string UrlApi { get; set; }
     }

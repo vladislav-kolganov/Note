@@ -126,7 +126,7 @@ namespace Note.DAL.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTime(2025, 4, 4, 19, 42, 53, 429, DateTimeKind.Utc).AddTicks(8094),
+                            CreatedAt = new DateTime(2025, 7, 20, 17, 7, 23, 40, DateTimeKind.Utc).AddTicks(2463),
                             CreatedBy = 0L,
                             Description = "tesrjigbejrfhibugehjrfiu",
                             Name = "testname1",
@@ -135,7 +135,7 @@ namespace Note.DAL.Migrations
                         new
                         {
                             Id = 2L,
-                            CreatedAt = new DateTime(2025, 4, 4, 19, 42, 53, 429, DateTimeKind.Utc).AddTicks(8098),
+                            CreatedAt = new DateTime(2025, 7, 20, 17, 7, 23, 40, DateTimeKind.Utc).AddTicks(2468),
                             CreatedBy = 0L,
                             Description = "fvddfgvdfvfvddfvvfd",
                             Name = "testname2",
@@ -212,14 +212,14 @@ namespace Note.DAL.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTime(2025, 4, 4, 19, 42, 53, 432, DateTimeKind.Utc).AddTicks(2641),
+                            CreatedAt = new DateTime(2025, 7, 20, 17, 7, 23, 42, DateTimeKind.Utc).AddTicks(9396),
                             Login = "Bob",
                             Password = "1221"
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedAt = new DateTime(2025, 4, 4, 19, 42, 53, 432, DateTimeKind.Utc).AddTicks(2647),
+                            CreatedAt = new DateTime(2025, 7, 20, 17, 7, 23, 42, DateTimeKind.Utc).AddTicks(9409),
                             Login = "user2",
                             Password = "1221"
                         });
@@ -277,7 +277,7 @@ namespace Note.DAL.Migrations
                         {
                             Id = 1L,
                             RefreshToken = "FRrgnjkfgnkfng2323nkrtrgb",
-                            RefreshTokenExpiryTime = new DateTime(2025, 4, 11, 19, 42, 53, 432, DateTimeKind.Utc).AddTicks(7245),
+                            RefreshTokenExpiryTime = new DateTime(2025, 7, 27, 17, 7, 23, 43, DateTimeKind.Utc).AddTicks(4780),
                             UserId = 1L
                         });
                 });
