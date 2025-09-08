@@ -30,7 +30,7 @@ namespace Note.Domain.Entity
         /// <summary>
         /// Фото пользователя
         /// </summary>
-        public string[]? Photo { get; set; }
+        public byte[]? Photo { get; set; }
 
         /// <summary>
         /// Токен пользователя

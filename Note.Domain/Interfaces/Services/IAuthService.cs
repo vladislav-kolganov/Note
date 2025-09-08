@@ -5,20 +5,22 @@ using Note.Domain.Result;
 namespace Note.Domain.Interfaces.Services
 {
     /// <summary>
-    /// Сервис предназначенный для регистрации/авторизации
+    /// Интерфейс сервиса предназначенный для 
+    /// регистрации/авторизации пользователей.
     /// </summary>
     public interface IAuthService
     {
         /// <summary>
-        /// Регистрация пользователя
+        /// Регистрация пользователя.
         /// </summary>
-        /// <returns></returns>
-        Task<BaseResult<UserDto>> Register( RegisterUserDto dto);
+        /// <param name="dto">Дто регистрации пользователя.</param>
+        Task<BaseResult<UserDto>> Register(RegisterUserDto dto);
+
         /// <summary>
-        /// Авторизация пользователя            /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<BaseResult<TokenDto>> Login( LoginUserDto dto);
+        /// Авторизация пользователя.
+        /// </summary>
+        /// <param name="dto">Дто авторизации пользователя.</param>
+        Task<BaseResult<TokenDto>> Login(LoginUserDto dto);
 
     }
 }
