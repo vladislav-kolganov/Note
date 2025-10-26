@@ -2,6 +2,7 @@ using Note.API;
 using Note.API.Middlewares;
 using Note.Application.DependencyInjection;
 using Note.DAL.DependencyInjection;
+using Prometheus;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
 
@@ -13,6 +14,8 @@ builder.Services.AddAuthenticationAndAutorization(builder);
 builder.Services.AddSwagger();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.UseHttpClientMetrics();
 
 builder.Services.AddDataAccessLayer(builder.Configuration);
 
@@ -51,6 +54,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+app.UseMetricServer();
+app.UseHttpMetrics();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
