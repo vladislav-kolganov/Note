@@ -2,49 +2,47 @@
 using System.Diagnostics;
 using System.Net;
 
-namespace Note.API.Middlewares
+namespace Note.API.Middlewares;
+
+public class ExceptionHandlingMiddleware
 {
-    public class ExceptionHandlingMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+        _next = next;
+        _logger = logger;
+    }
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    public async Task InvokeAsync(HttpContext httpContext)
+    {
+        try
         {
-            _next = next;
-            _logger = logger;
+            await _next(httpContext);
         }
-
-        public async Task InvokeAsync(HttpContext httpContext)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(httpContext);
-            }
-            catch (Exception ex)
-            {
-                Debugger.Break();
+            Debugger.Break();
 
-                await HandleExceptionAsync(httpContext, ex);
-            }
-        }
-
-        private async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
-        {
-            _logger.LogWarning(exception, exception.Message);
-
-            var errorMessage = exception.Message;
-            var response = exception switch
-            {
-                UnauthorizedAccessException => new BaseResult() { ErrorMessage = errorMessage, ErrorCode = (int)HttpStatusCode.Unauthorized },
-                _ => new BaseResult() { ErrorMessage = "Internal server error. Please retry later", ErrorCode = (int)HttpStatusCode.InternalServerError }
-            };
-
-            httpContext.Response.ContentType = "application/json";
-            httpContext.Response.StatusCode = (int)response.ErrorCode;
-
-            await httpContext.Response.WriteAsJsonAsync(response);
+            await HandleExceptionAsync(httpContext, ex);
         }
     }
 
+    private async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
+    {
+        _logger.LogWarning(exception, exception.Message);
+
+        var errorMessage = exception.Message;
+        var response = exception switch
+        {
+            UnauthorizedAccessException => new BaseResult() { ErrorMessage = errorMessage, ErrorCode = (int)HttpStatusCode.Unauthorized },
+            _ => new BaseResult() { ErrorMessage = "Internal server error. Please retry later", ErrorCode = (int)HttpStatusCode.InternalServerError }
+        };
+
+        httpContext.Response.ContentType = "application/json";
+        httpContext.Response.StatusCode = (int)response.ErrorCode;
+
+        await httpContext.Response.WriteAsJsonAsync(response);
+    }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
+using Note.Application.Services.Helpers;
 using Note.Domain.Dto;
 using Note.Domain.Dto.UserDto;
 using Note.Domain.Entity;
@@ -52,75 +53,82 @@ public class AuthService : IAuthService
 
     public async Task<BaseResult<TokenDto>> Login(LoginUserDto dto)
     {
-        var user = await _userRepositoory.GetAll()
-                .Include(x => x.Role)
-                .FirstOrDefaultAsync(x => x.Login == dto.Login);
-
-        if (user == null)
+        try
         {
-            return new BaseResult<TokenDto>()
+            var user = await _userRepositoory.GetAll()
+            .Include(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Login == dto.Login);
+
+            if (user == null)
             {
-                ErrorMessage = ErrorMessage.UserNotFound,
-                ErrorCode = (int)ErrorCodes.UserNotFound
-            };
-        }
-
-        var isVerifyPassword = IsVerifyPassword(user.Password, dto.Password);
-
-        if (!isVerifyPassword)
-        {
-            return new BaseResult<TokenDto>()
-            {
-                ErrorMessage = ErrorMessage.PasswordIsWrong,
-                ErrorCode = (int)ErrorCodes.PasswordIsWrong
-            };
-        }
-
-        var userToken = await _userTokenRepository.GetAll().
-                              FirstOrDefaultAsync(x => x.UserId == user.Id);
-
-        var userRols = user.Role;
-
-        var claims = userRols.Select(x => new Claim(ClaimTypes.Role, x.Name)).
-                     ToList();
-        claims.Add(new Claim(ClaimTypes.Name, dto.Login));
-
-        var accessToken = _tokenService.GenerateAccessToken(claims);
-        var refreshToken = _tokenService.GenerateRefreshToken();
-
-        if (userToken == null)
-        {
-            userToken = new UserToken()
-            {
-                UserId = user.Id,
-                RefreshToken = refreshToken,
-                RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7),
-            };
-
-            await _userTokenRepository.CreateAsync(userToken);
-        }
-        else
-        {
-            userToken.RefreshToken = refreshToken;
-            userToken.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-
-            _userTokenRepository.Update(userToken);
-            await _userTokenRepository.SaveChangeAsync();
-        }
-
-        user.LastLoginDate = DateTime.UtcNow;
-
-        _userRepositoory.Update(user);
-        await _unitOfWork.SaveChangeAsync();
-
-        return new BaseResult<TokenDto>()
-        {
-            Data = new TokenDto()
-            {
-                RefreshToken = refreshToken,
-                AccessToken = accessToken
+                return new BaseResult<TokenDto>()
+                {
+                    ErrorMessage = ErrorMessage.UserNotFound,
+                    ErrorCode = (int)ErrorCodes.UserNotFound
+                };
             }
-        };
+
+            var isVerifyPassword = IsVerifyPassword(user.Password, dto.Password);
+
+            if (!isVerifyPassword)
+            {
+                return new BaseResult<TokenDto>()
+                {
+                    ErrorMessage = ErrorMessage.PasswordIsWrong,
+                    ErrorCode = (int)ErrorCodes.PasswordIsWrong
+                };
+            }
+
+            var userToken = await _userTokenRepository.GetAll().
+                                  FirstOrDefaultAsync(x => x.UserId == user.Id);
+
+            var userRols = user.Role;
+
+            var claims = userRols.Select(x => new Claim(ClaimTypes.Role, x.Name)).
+                         ToList();
+            claims.Add(new Claim(ClaimTypes.Name, dto.Login));
+
+            var accessToken = _tokenService.GenerateAccessToken(claims);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            if (userToken == null)
+            {
+                userToken = new UserToken()
+                {
+                    UserId = user.Id,
+                    RefreshToken = refreshToken,
+                    RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7),
+                };
+
+                await _userTokenRepository.CreateAsync(userToken);
+            }
+            else
+            {
+                userToken.RefreshToken = refreshToken;
+                userToken.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+                _userTokenRepository.Update(userToken);
+                await _userTokenRepository.SaveChangeAsync();
+            }
+
+            user.LastLoginDate = DateTime.UtcNow;
+
+            _userRepositoory.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new BaseResult<TokenDto>()
+            {
+                Data = new TokenDto()
+                {
+                    RefreshToken = refreshToken,
+                    AccessToken = accessToken
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<TokenDto>.LogException(ex.Message, _logger);
+        }
     }
 
     public async Task<BaseResult<UserDto>> Register(RegisterUserDto dto)
@@ -190,15 +198,11 @@ public class AuthService : IAuthService
                     Data = _mapper.Map<UserDto>(user)
                 };
             }
-            catch
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
 
-                return new BaseResult<UserDto>
-                {
-                    ErrorMessage = ErrorMessage.InternalServerError,
-                    ErrorCode = (int)ErrorCodes.InternalServerError
-                };
+                return LogErrorHelper<UserDto>.LogException(ex.Message, _logger);
             }
         }
 

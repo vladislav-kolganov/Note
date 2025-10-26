@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Note.Domain.Result;
 
-namespace Note.Domain.Result
+public class CollectionResult<T> : BaseResult<IEnumerable<T>>
 {
-    public class CollectionResult <T>: BaseResult<IEnumerable<T>>
-    {
-        public int Count { get; set; }
-    }
+    public int Count { get; set; }
 }

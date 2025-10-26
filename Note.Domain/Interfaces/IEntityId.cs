@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Note.Domain.Interfaces;
 
-namespace Note.Domain.Interfaces
+public interface IEntityId<T> where T : struct
 {
-    public interface IEntityId <T> where T : struct
-    {
-        public T Id { get; set; }
-    }
+    public T Id { get; set; }
 }

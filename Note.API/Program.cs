@@ -3,6 +3,7 @@ using Note.API.Middlewares;
 using Note.Application.DependencyInjection;
 using Note.DAL.DependencyInjection;
 using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +16,23 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDataAccessLayer(builder.Configuration);
 
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Logging.ClearProviders();
+
 builder.Host.UseSerilog((context, config) =>
 {
-    config.ReadFrom.Configuration(context.Configuration);
+    config.Enrich.FromLogContext().
+    Enrich.WithMachineName().
+    WriteTo.Console().
+    WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(context.Configuration["ElkSettings:Uri"]))
+    {
+        IndexFormat = $"{context.Configuration["ApplicationName:Name"]}-logs-{context.HostingEnvironment.EnvironmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+        AutoRegisterTemplate = true
+    }).
+    Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName).
+    ReadFrom.Configuration(context.Configuration);
+
 });
 
 builder.Services.AddApplication();

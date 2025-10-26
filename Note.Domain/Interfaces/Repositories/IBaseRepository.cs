@@ -1,22 +1,31 @@
 ﻿using Note.Domain.Interfaces.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Note.Domain.Interfaces.Repositories
+namespace Note.Domain.Interfaces.Repositories;
+
+public interface IBaseRepository<TEntity> : IStateSaveChanges
 {
-    public interface IBaseRepository<TEntity> : IStateSaveChanges
-    {   // прописываем CRUD операции
-        IQueryable<TEntity> GetAll(); // select - извлеение записей из бд
+    /// <summary>
+    /// Извлечь сущности.
+    /// </summary>
+    IQueryable<TEntity> GetAll();
 
-       Task <TEntity> CreateAsync (TEntity entity); // insert
+    /// <summary>
+    /// Создать сущность.
+    /// </summary>
+    /// <param name="entity">Сущность.</param>
+    Task<TEntity> CreateAsync(TEntity entity);
 
-        TEntity Update (TEntity entity); // update 
+    /// <summary>
+    /// Обновить сущность.
+    /// </summary>
+    /// <param name="entity">Сущность.</param>
+    TEntity Update(TEntity entity);
 
-        void  Remove (TEntity entity);  // delete
-     
+    /// <summary>
+    /// Удалить сущность.
+    /// </summary>
+    /// <param name="entity">Сущность.</param>
+    void Remove(TEntity entity);
 
-    }
+
 }

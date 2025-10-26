@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Note.Application.Resources;
+using Note.Application.Services.Helpers;
 using Note.Domain.Dto;
 using Note.Domain.Entity;
 using Note.Domain.Interfaces.Repositories;
@@ -13,24 +15,28 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Note.Application.Services
+namespace Note.Application.Services;
+
+public class TokenService : ITokenService
 {
-    public class TokenService : ITokenService
+    private readonly IBaseRepository<User> _userRepository;
+    private readonly string _jwtKey;
+    private readonly string _issuer;
+    private readonly string _audience;
+    private readonly ILogger<TokenService> _logger;
+
+    public TokenService(IOptions<JwtSettings> options, IBaseRepository<User> userRepository, ILogger<TokenService> logger)
     {
-        private readonly IBaseRepository<User> _userRepository;
-        private readonly string _jwtKey;
-        private readonly string _issuer;
-        private readonly string _audience;
+        _jwtKey = options.Value.JwtKey;
+        _issuer = options.Value.Issuer;
+        _audience = options.Value.Audience;
+        _userRepository = userRepository;
+        _logger = logger;
+    }
 
-        public TokenService(IOptions<JwtSettings> options, IBaseRepository<User> userRepository)
-        {
-            _jwtKey = options.Value.JwtKey;
-            _issuer = options.Value.Issuer;
-            _audience = options.Value.Audience;
-            _userRepository = userRepository;
-        }
-
-        public string GenerateAccessToken(IEnumerable<Claim> claims)
+    public string GenerateAccessToken(IEnumerable<Claim> claims)
+    {
+        try
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
 
@@ -40,48 +46,62 @@ namespace Note.Application.Services
                 new JwtSecurityToken(_issuer, _audience, claims, null, DateTime.UtcNow.AddMinutes(10), credentials);
 
             var token = new JwtSecurityTokenHandler().WriteToken(securityToken);
+
             return token;
         }
-
-        public string GenerateRefreshToken()
+        catch (Exception ex)
         {
-            var randomNumbers = new byte[32];
-            var randomNumberGenerator = RandomNumberGenerator.Create();
-            randomNumberGenerator.GetBytes(randomNumbers);
-            return Convert.ToBase64String(randomNumbers);
+            _logger.LogError(ex.Message);
+
+            return String.Empty;
+        }
+    }
+
+    public string GenerateRefreshToken()
+    {
+        var randomNumbers = new byte[32];
+        var randomNumberGenerator = RandomNumberGenerator.Create();
+        randomNumberGenerator.GetBytes(randomNumbers);
+
+        return Convert.ToBase64String(randomNumbers);
+    }
+
+    public ClaimsPrincipal GetPrincipalFromExipredToken(string accessToken)
+    {
+        var tokenValidationParametrs = new TokenValidationParameters()
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey)),
+            ValidateLifetime = true,
+            ValidAudience = _audience,
+            ValidIssuer = _issuer
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var claimsPrincipal = tokenHandler.ValidateToken(accessToken, tokenValidationParametrs, out var securityToken);
+        if (securityToken is not JwtSecurityToken jwtSecurityToken
+            || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+        {
+            throw new SecurityTokenException(ErrorMessage.InvalidToken);
         }
 
-        public ClaimsPrincipal GetPrincipalFromExipredToken(string accessToken)
-        {
-            var tokenValidationParametrs = new TokenValidationParameters()
-            {
-                ValidateAudience = true,
-                ValidateIssuer = true,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey)),
-                ValidateLifetime = true,
-                ValidAudience = _audience,
-                ValidIssuer = _issuer
-            };
+        return claimsPrincipal;
+    }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var claimsPrincipal = tokenHandler.ValidateToken(accessToken, tokenValidationParametrs, out var securityToken);
-            if (securityToken is not JwtSecurityToken jwtSecurityToken
-                || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            {
-                throw new SecurityTokenException(ErrorMessage.InvalidToken);
-            }
-            return claimsPrincipal;
-        }
-
-        public async Task<BaseResult<TokenDto>> RefreshToken(TokenDto dto)
+    public async Task<BaseResult<TokenDto>> RefreshToken(TokenDto dto)
+    {
+        try
         {
             var accessToken = dto.AccessToken;
             var refreshToken = dto.RefreshToken;
 
             var claimsPrincipal = GetPrincipalFromExipredToken(accessToken);
             var userName = claimsPrincipal.Identity?.Name;
-            var user = await _userRepository.GetAll().Include(x => x.UserToken).FirstOrDefaultAsync(x => x.Login == userName);
+
+            var user = await _userRepository.GetAll().Include(x => x.UserToken).
+                FirstOrDefaultAsync(x => x.Login == userName);
 
             if (user == null || user.UserToken.RefreshToken != refreshToken || user.UserToken.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
@@ -106,6 +126,14 @@ namespace Note.Application.Services
                     RefreshToken = newRefreshToken
                 }
             };
+        }
+        catch (SecurityTokenException ex)
+        {
+            return LogErrorHelper<TokenDto>.LogException(ex.Message, _logger);
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<TokenDto>.LogException(ex.Message, _logger);
         }
     }
 }

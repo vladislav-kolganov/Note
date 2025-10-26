@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
+using Note.Application.Services.Helpers;
 using Note.Domain.Dto.ReportDto;
 using Note.Domain.Entity;
 using Note.Domain.Enum;
@@ -9,66 +10,67 @@ using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Interfaces.Validations;
 using Note.Domain.Result;
-using Serilog;
 
-namespace Note.Application.Services
+namespace Note.Application.Services;
+
+public class ReportService : IReportService
 {
-    public class ReportService : IReportService
+    private readonly IBaseRepository<Report> _reportRepository;
+    private readonly IBaseRepository<User> _userRepository;
+    private readonly IReportValidator _reportValidator;
+    private readonly IMapper _mappper;
+    private readonly ILogger<ReportService> _logger;
+
+    public ReportService(
+        IBaseRepository<Report> reportRepository,
+        IBaseRepository<User> userRepository,
+        IReportValidator reportValidator,
+        ILogger<ReportService> logger,
+        IMapper mapper)
     {
-        private readonly IBaseRepository<Report> _reportRepository;
-        private readonly IBaseRepository<User> _userRepository;
-        private readonly IReportValidator _reportValidator;
-        private readonly IMapper _mappper;
-        private readonly ILogger<ReportService> _logger;
+        _reportRepository = reportRepository;
+        _userRepository = userRepository;
+        _reportValidator = reportValidator;
+        _logger = logger;
+        _mappper = mapper;
+    }
 
-        public ReportService(
-            IBaseRepository<Report> reportRepository,
-            IBaseRepository<User> userRepository,
-            IReportValidator reportValidator,
-            ILogger<ReportService> logger,
-            IMapper mapper)
+    public async Task<CollectionResult<ReportDto>> GetResultAsync(long userId)
+    {
+        ReportDto[] reports;
+        reports = await _reportRepository.GetAll()
+         .Where(x => x.UserId == userId)
+         .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.CreatedAt.ToLongDateString()))
+         .ToArrayAsync();
+
+        if (!reports.Any())
         {
-            _reportRepository = reportRepository;
-            _userRepository = userRepository;
-            _reportValidator = reportValidator;
-            _logger = logger;
-            _mappper = mapper;
-        }
+            _logger.LogWarning(ErrorMessage.ReportsNotFound, reports.Length);
 
-        public async Task<CollectionResult<ReportDto>> GetResultAsync(long userId)
-        {
-            ReportDto[] reports;
-            reports = await _reportRepository.GetAll()
-             .Where(x => x.UserId == userId)
-             .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.CreatedAt.ToLongDateString()))
-             .ToArrayAsync();
-
-            if (!reports.Any())
+            return new CollectionResult<ReportDto>()
             {
-                _logger.LogWarning(ErrorMessage.ReportsNotFound, reports.Length);
-
-                return new CollectionResult<ReportDto>()
-                {
-                    ErrorMessage = ErrorMessage.ReportsNotFound,
-                    ErrorCode = (int)ErrorCodes.ReportsNotFound
-                };
-            }
-
-            return new CollectionResult<ReportDto>
-            {
-                Data = reports,
-                Count = reports.Length
+                ErrorMessage = ErrorMessage.ReportsNotFound,
+                ErrorCode = (int)ErrorCodes.ReportsNotFound
             };
-
         }
 
-        public async Task<BaseResult<ReportDto>> GetReportAsync(long id)
+        return new CollectionResult<ReportDto>
         {
-            ReportDto? report;
-            report = await _reportRepository.GetAll()
-                    .Where(x => x.Id == id)
-                    .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.CreatedAt.ToLongDateString()))
-                    .FirstOrDefaultAsync();
+            Data = reports,
+            Count = reports.Length
+        };
+
+    }
+
+    public async Task<BaseResult<ReportDto>> GetReportAsync(long id)
+    {
+        try
+        {
+            var report = await _reportRepository.GetAll()
+            .Where(x => x.Id == id)
+            .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.CreatedAt.ToLongDateString()))
+            .FirstOrDefaultAsync();
+
             if (report == null)
             {
                 _logger.LogWarning($"Отчёт с таким {id} не найден", id);
@@ -84,13 +86,20 @@ namespace Note.Application.Services
                 Data = report
             };
         }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<ReportDto>.LogException(ex.Message, _logger);
+        }
+    }
 
-        /// <summary>
-        /// Создание отчёта
-        /// </summary>
-        /// <param name="dto">Дто с информацией для создания отчёта</param>
-        /// <returns>Дто созданного отчёта</returns>
-        public async Task<BaseResult<ReportDto>> CreateReportAsync(CreateReportDto dto)
+    /// <summary>
+    /// Создание отчёта
+    /// </summary>
+    /// <param name="dto">Дто с информацией для создания отчёта</param>
+    /// <returns>Дто созданного отчёта</returns>
+    public async Task<BaseResult<ReportDto>> CreateReportAsync(CreateReportDto dto)
+    {
+        try
         {
             var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == dto.UserId);
             var report = await _reportRepository.GetAll().FirstOrDefaultAsync(x => x.Name == dto.Name);
@@ -121,15 +130,23 @@ namespace Note.Application.Services
             };
 
         }
-
-        /// <summary>
-        /// Эндпоинт удаления отчёта
-        /// </summary>
-        /// <param name="id">Id отчёта</param>
-        /// <returns>Дто удаленного отчёта</returns>
-        public async Task<BaseResult<ReportDto>> DeleteReportAsync(long id)
+        catch (Exception ex)
         {
-            var report = await _reportRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+            return LogErrorHelper<ReportDto>.LogException(ex.Message, _logger);
+        }
+    }
+
+    /// <summary>
+    /// Эндпоинт удаления отчёта
+    /// </summary>
+    /// <param name="id">Id отчёта</param>
+    /// <returns>Дто удаленного отчёта</returns>
+    public async Task<BaseResult<ReportDto>> DeleteReportAsync(long id)
+    {
+        try
+        {
+            var report = await _reportRepository.GetAll().
+        FirstOrDefaultAsync(x => x.Id == id);
             var result = _reportValidator.ValidateOnNull(report);
 
             if (!result.IsSuccess)
@@ -148,15 +165,24 @@ namespace Note.Application.Services
                 Data = _mappper.Map<ReportDto>(report)
             };
         }
-
-        /// <summary>
-        /// Обновление отчёта.
-        /// </summary>
-        /// <param name="dto"> Дто с обновлениями</param>
-        /// <returns>Дто обновленного отчёта.</returns>
-        public async Task<BaseResult<ReportDto>> UpdateReportAsync(UpdateReportDto dto)
+        catch (Exception ex)
         {
-            var report = await _reportRepository.GetAll().FirstOrDefaultAsync(x => x.Id == dto.Id);
+            return LogErrorHelper<ReportDto>.LogException(ex.Message, _logger);
+        }
+    }
+
+    /// <summary>
+    /// Обновление отчёта.
+    /// </summary>
+    /// <param name="dto"> Дто с обновлениями</param>
+    /// <returns>Дто обновленного отчёта.</returns>
+    public async Task<BaseResult<ReportDto>> UpdateReportAsync(UpdateReportDto dto)
+    {
+        try
+        {
+            var report = await _reportRepository.GetAll().
+                FirstOrDefaultAsync(x => x.Id == dto.Id);
+
             var result = _reportValidator.ValidateOnNull(report);
 
             if (!result.IsSuccess)
@@ -178,6 +204,10 @@ namespace Note.Application.Services
             {
                 Data = _mappper.Map<ReportDto>(updatedReport)
             };
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<ReportDto>.LogException(ex.Message, _logger);
         }
     }
 }

@@ -2,18 +2,17 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Note.Domain.Entity.ChatEntity;
 
-namespace Note.DAL.Configurations.ChatConfigurations
-{
-    public class MessageConfiguration : IEntityTypeConfiguration<Message>
-    {
-        public void Configure(EntityTypeBuilder<Message> builder)
-        {
-            builder.Property(x => x.Id).ValueGeneratedOnAdd();
-            builder.Property(x => x.TextMessage).IsRequired().HasMaxLength(10000);
-            builder.Property(x => x.ProducerMessageId).IsRequired();
-            builder.Property(x => x.ConsumerMessageId).IsRequired();
-            builder.Property(x => x.CreatedAt).IsRequired();
+namespace Note.DAL.Configurations.ChatConfigurations;
 
-        }
+public class MessageConfiguration : IEntityTypeConfiguration<Message>
+{
+    public void Configure(EntityTypeBuilder<Message> builder)
+    {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
+        builder.Property(x => x.TextMessage).IsRequired().HasMaxLength(10000);
+        builder.Property(x => x.ProducerMessageId).IsRequired();
+        builder.Property(x => x.ConsumerMessageId).IsRequired();
+        builder.Property(x => x.CreatedAt).IsRequired();
+
     }
 }

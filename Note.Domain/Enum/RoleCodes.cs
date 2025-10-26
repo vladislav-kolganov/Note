@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Note.Domain.Enum;
 
-namespace Note.Domain.Enum
+public enum RoleCodes
 {
-    public enum RoleCodes
-    {
-        User = 0,
-        Moderator = 1,
-        Admin = 2,
-    }
+    User = 0,
+    Moderator = 1,
+    Admin = 2,
 }

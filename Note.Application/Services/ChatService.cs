@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
 using Note.Application.Services.Extensions;
+using Note.Application.Services.Helpers;
 using Note.Domain.Entity;
 using Note.Domain.Entity.ChatEntity;
 using Note.Domain.Enum;
@@ -9,47 +11,50 @@ using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
 
-namespace Note.Application.Services
+namespace Note.Application.Services;
+
+public class ChatService : IChatService
 {
-    public class ChatService : IChatService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IBaseRepository<User> _userRepository;
+    private readonly IBaseRepository<Chat> _chatRepository;
+    private readonly IBaseRepository<Message> _messageRepository;
+    private readonly ILogger<ChatService> _logger;
+
+    public ChatService(
+        IUnitOfWork unitOfWork,
+        IBaseRepository<User> userRepositoory,
+        IBaseRepository<Chat> chatRepositoory,
+        IBaseRepository<Message> messageRepositoory,
+        ILogger<ChatService> logger)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IBaseRepository<User> _userRepository;
-        private readonly IBaseRepository<Chat> _chatRepository;
-        private readonly IBaseRepository<Message> _messageRepository;
+        _unitOfWork = unitOfWork;
+        _userRepository = userRepositoory;
+        _chatRepository = chatRepositoory;
+        _messageRepository = messageRepositoory;
+        _logger = logger;
+    }
 
-
-        public ChatService(
-            IUnitOfWork unitOfWork,
-            IBaseRepository<User> userRepositoory,
-            IBaseRepository<Chat> chatRepositoory,
-            IBaseRepository<Message> messageRepositoory)
+    /// <summary>
+    /// Создать сообщение.
+    /// </summary>
+    /// <param name="chatId">Id чата.</param>
+    /// <param name="producerMessageId">Id отправителя сообщения.</param>
+    /// <param name="consumerMessageId">Id получателя сообщения.</param>
+    /// <param name="textMessage">Текст сообщения.</param>
+    /// <param name="photo">Фото сообщения.</param>
+    /// <returns></returns>
+    public async Task<BaseResult<Message>> CreateMessage
+    (
+     long chatId,
+     long producerMessageId,
+     long consumerMessageId,
+     string? textMessage,
+     List<byte[]>? photo
+    )
+    {
+        try
         {
-            _unitOfWork = unitOfWork;
-            _userRepository = userRepositoory;
-            _chatRepository = chatRepositoory;
-            _messageRepository = messageRepositoory;
-        }
-
-        /// <summary>
-        /// Создать сообщение.
-        /// </summary>
-        /// <param name="chatId">Id чата.</param>
-        /// <param name="producerMessageId">Id отправителя сообщения.</param>
-        /// <param name="consumerMessageId">Id получателя сообщения.</param>
-        /// <param name="textMessage">Текст сообщения.</param>
-        /// <param name="photo">Фото сообщения.</param>
-        /// <returns></returns>
-        public async Task<BaseResult<Message>> CreateMessage
-        (
-         long chatId,
-         long producerMessageId,
-         long consumerMessageId,
-         string? textMessage,
-         List<byte[]>? photo
-        )
-        {
-
             if (textMessage == null && photo == null)
             {
                 return new BaseResult<Message>()
@@ -72,7 +77,6 @@ namespace Note.Application.Services
                 {
                     ErrorMessage = ErrorMessage.UserNotFound,
                     ErrorCode = (int)ErrorCodes.UserNotFound,
-
                 };
             }
 
@@ -110,16 +114,23 @@ namespace Note.Application.Services
                 Data = message
             };
         }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<Message>.LogException(ex.Message, _logger);
+        }
+    }
 
-        /// <summary>
-        /// Удаление чата пользователя
-        /// </summary>
-        /// <param name="chatId">Id чата </param>
-        /// <param name="userId">Id пользователя</param>
-        public async Task<BaseResult<bool>> DeleteChat(long chatId)
+    /// <summary>
+    /// Удаление чата пользователя
+    /// </summary>
+    /// <param name="chatId">Id чата </param>
+    /// <param name="userId">Id пользователя</param>
+    public async Task<BaseResult<bool>> DeleteChat(long chatId)
+    {
+        try
         {
             var chat = await _chatRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.Id == chatId);
+                 .FirstOrDefaultAsync(x => x.Id == chatId);
 
             if (chat == null)
             {
@@ -138,11 +149,18 @@ namespace Note.Application.Services
                 Data = true
             };
         }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<bool>.LogException(ex.Message, _logger);
+        }
+    }
 
-        public async Task<BaseResult<Message>> EditMessage(long messageId, string textMessage)
+    public async Task<BaseResult<Message>> EditMessage(long messageId, string textMessage)
+    {
+        try
         {
             var message = await _messageRepository.GetAll().
-                FirstOrDefaultAsync(x => x.Id == messageId);
+                 FirstOrDefaultAsync(x => x.Id == messageId);
 
             if (message != null && textMessage.IsNullOrWhiteSpace())
             {
@@ -164,12 +182,19 @@ namespace Note.Application.Services
                 ErrorCode = (int)ErrorChatCodes.MessageNotFound
             };
         }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<Message>.LogException(ex.Message, _logger);
+        }
+    }
 
-        public async Task<CollectionResult<Chat>> GetChats(long userId)
+    public async Task<CollectionResult<Chat>> GetChats(long userId)
+    {
+        try
         {
             Chat[] chats = await _chatRepository.GetAll()
-                .Where(x => x.User1 == userId || x.User2 == userId)
-                .ToArrayAsync();
+        .Where(x => x.User1 == userId || x.User2 == userId)
+        .ToArrayAsync();
 
             if (!chats.IsNotNullOrEmpty())
             {
@@ -186,12 +211,19 @@ namespace Note.Application.Services
                 Count = chats.Length
             };
         }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<Chat>.LogExceptionForCollection(ex.Message, _logger);
+        }
+    }
 
-        public async Task<BaseResult<Message>> GetLastMessage(long chatId)
+    public async Task<BaseResult<Message>> GetLastMessage(long chatId)
+    {
+        try
         {
             var lastMessage = await _messageRepository.GetAll().
-                Where(x => x.ChatId == chatId).
-                LastOrDefaultAsync();
+                            Where(x => x.ChatId == chatId).
+                            LastOrDefaultAsync();
 
             if (lastMessage != null)
             {
@@ -207,11 +239,18 @@ namespace Note.Application.Services
                 ErrorCode = (int)ErrorChatCodes.MessageNotFound
             };
         }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<Message>.LogException(ex.Message, _logger);
+        }
+    }
 
-        public async Task<CollectionResult<Message>> GetMessages(long chatId)
+    public async Task<CollectionResult<Message>> GetMessages(long chatId)
+    {
+        try
         {
             Message[] messages = await _messageRepository.GetAll()
-                     .Where(x => x.ChatId == chatId).ToArrayAsync();
+             .Where(x => x.ChatId == chatId).ToArrayAsync();
 
             if (!messages.IsNotNullOrEmpty())
             {
@@ -228,6 +267,10 @@ namespace Note.Application.Services
                 Data = messages,
                 Count = messages.Length
             };
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<Message>.LogExceptionForCollection(ex.Message, _logger);
         }
     }
 }

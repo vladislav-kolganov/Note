@@ -6,30 +6,54 @@ services:
       dockerfile: Note.API/Dockerfile
     ports:
       - "5433:5433"
-      - "8081:8081"
     depends_on:
       - db
-      - mongo
+      - elasticsearch
     environment:
-      - "PostgresSettings__ConnectionString=Host=db;Port=5432;Database=chat;Username=admin;Password=admin"
-      - "PostgresSettings__Schema=chat"
-      - "ConnectionStrings__Mongo=mongodb://user:password@mongo:27017"
-      - "MongoDbSettings__Database=logs"
-      - "MongoDbSettings__Collection=app_logs"
-
+      - ASPNETCORE_URLS=http://+:5433
+      - PostgresSettings__ConnectionString=Host=db;Port=5432;Database=chat;Username=admin;Password=admin
+      - PostgresSettings__Schema=chat
+      - ElkSettings__Uri=http://elasticsearch:9200
+      - ApplicationName__Name=note
+    networks:                
+      - elk
   db:
     image: postgres:15-alpine
+    container_name: postgre
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: chat
     ports:
       - "5432:5432"
+    networks:                
+      - elk
 
-  mongo:
-    image: mongo:latest
+  elasticsearch:
+    image: elasticsearch:9.2.0
+    container_name: elasticsearch
     environment:
-      MONGO_INITDB_ROOT_USERNAME: user
-      MONGO_INITDB_ROOT_PASSWORD: password
-    ports: 
-    - "27017:27017"
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+    ports:
+      - "9200:9200"
+    networks: 
+      - elk
+
+  kibana:
+    image: kibana:9.2.0
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks: 
+      - elk
+
+networks: 
+    elk:
+       driver: bridge  

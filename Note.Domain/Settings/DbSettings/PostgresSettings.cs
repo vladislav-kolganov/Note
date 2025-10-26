@@ -1,15 +1,14 @@
 ﻿using Note.Domain.Settings.DbSettings.AdbstractDbSettings;
 
-namespace Note.Domain.Settings.DbSettings
+namespace Note.Domain.Settings.DbSettings;
+
+/// <summary>
+/// Настройки Постргесс БД.
+/// </summary>
+public class PostgresSettings : AbstractDbSettings
 {
     /// <summary>
-    /// Настройки Постргесс БД.
+    /// Схема.
     /// </summary>
-    public class PostgresSettings : AbstractDbSettings
-    {
-        /// <summary>
-        /// Схема.
-        /// </summary>
-        public string? Schema { get; set; }
-    }
+    public string? Schema { get; set; }
 }
