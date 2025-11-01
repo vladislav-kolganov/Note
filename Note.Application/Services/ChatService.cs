@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
 using Note.Application.Services.Extensions;
 using Note.Application.Services.Helpers;
+using Note.Domain.Dto.ChatDto;
 using Note.Domain.Entity;
 using Note.Domain.Entity.ChatEntity;
 using Note.Domain.Enum;
@@ -35,27 +36,11 @@ public class ChatService : IChatService
         _logger = logger;
     }
 
-    /// <summary>
-    /// Создать сообщение.
-    /// </summary>
-    /// <param name="chatId">Id чата.</param>
-    /// <param name="producerMessageId">Id отправителя сообщения.</param>
-    /// <param name="consumerMessageId">Id получателя сообщения.</param>
-    /// <param name="textMessage">Текст сообщения.</param>
-    /// <param name="photo">Фото сообщения.</param>
-    /// <returns></returns>
-    public async Task<BaseResult<Message>> CreateMessage
-    (
-     long chatId,
-     long producerMessageId,
-     long consumerMessageId,
-     string? textMessage,
-     List<byte[]>? photo
-    )
+    public async Task<BaseResult<Message>> CreateMessage(CreateMessageDto dto)
     {
         try
         {
-            if (textMessage == null && photo == null)
+            if (dto.textMessage == null && dto.photo.IsNullOrEmpty())
             {
                 return new BaseResult<Message>()
                 {
@@ -65,10 +50,10 @@ public class ChatService : IChatService
             }
 
             var producerMessage = await _userRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.Id == producerMessageId);
+                .FirstOrDefaultAsync(x => x.Id == dto.producerMessageId);
 
             var consumerMessage = await _userRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.Id == consumerMessageId);
+                .FirstOrDefaultAsync(x => x.Id == dto.consumerMessageId);
 
 
             if (producerMessage == null || consumerMessage == null)
@@ -80,15 +65,26 @@ public class ChatService : IChatService
                 };
             }
 
-            var chat = await _chatRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.Id == chatId);
+            Chat chat;
 
+            if (dto.chatId.HasValue && dto.chatId.Value >= 0)
+            {
+                chat = await _chatRepository.GetAll()
+                    .FirstOrDefaultAsync(x => x.Id == dto.chatId.Value);
+            }
+            else
+            {
+                chat = await _chatRepository.GetAll().
+                FirstOrDefaultAsync(x =>
+                    (x.User1 == dto.producerMessageId && x.User2 == dto.consumerMessageId) ||
+                    (x.User1 == dto.consumerMessageId && x.User2 == dto.producerMessageId));
+            }
             if (chat == null)
             {
                 chat = new Chat()
                 {
-                    User1 = producerMessageId,
-                    User2 = consumerMessageId,
+                    User1 = dto.producerMessageId,
+                    User2 = dto.consumerMessageId,
                     CreatedAt = DateTime.UtcNow,
                 };
 
@@ -99,12 +95,17 @@ public class ChatService : IChatService
             var message = new Message()
             {
                 ChatId = chat.Id,
-                TextMessage = textMessage,
-                ProducerMessageId = producerMessageId,
-                ConsumerMessageId = consumerMessageId,
-                Photo = photo,
+                TextMessage = dto.textMessage,
+                ProducerMessageId = dto.producerMessageId,
+                ConsumerMessageId = dto.consumerMessageId,
                 CreatedAt = DateTime.UtcNow
             };
+            if (dto.photo.IsNotNullOrEmpty())
+            {
+                message.Photos = dto.photo.Where(p => p.IsNotNullOrEmpty())
+                    .Select(p => new MessagePhoto { Content = p })
+                    .ToList();
+            }
 
             await _messageRepository.CreateAsync(message);
             await _unitOfWork.SaveChangeAsync();
@@ -155,32 +156,38 @@ public class ChatService : IChatService
         }
     }
 
-    public async Task<BaseResult<Message>> EditMessage(long messageId, string textMessage)
+    public async Task<BaseResult<Message>> EditMessage(EditMessageDto dto)
     {
         try
         {
             var message = await _messageRepository.GetAll().
-                 FirstOrDefaultAsync(x => x.Id == messageId);
+                 FirstOrDefaultAsync(x => x.Id == dto.messageId);
 
-            if (message != null && textMessage.IsNullOrWhiteSpace())
+            if (message == null)
             {
-                message.UpdatedAt = DateTime.UtcNow;
-                message.TextMessage = textMessage;
-
-                _messageRepository.Update(message);
-                await _unitOfWork.SaveChangeAsync();
-
-                return new BaseResult<Message>()
+                return new BaseResult<Message>
                 {
-                    Data = message
+                    ErrorMessage = ErrorMessage.MessageNotFound,
+                    ErrorCode = (int)ErrorChatCodes.MessageNotFound
                 };
             }
 
-            return new BaseResult<Message>()
+            if (string.IsNullOrWhiteSpace(dto.textMessage))
             {
-                ErrorMessage = ErrorMessage.MessageNotFound,
-                ErrorCode = (int)ErrorChatCodes.MessageNotFound
-            };
+                return new BaseResult<Message>
+                {
+                    ErrorMessage = ErrorMessage.MessageIsEmpty,
+                    ErrorCode = (int)ErrorChatCodes.MessageIsEmpty
+                };
+            }
+
+            message.TextMessage = dto.textMessage;
+            message.UpdatedAt = DateTime.UtcNow;
+
+            _messageRepository.Update(message);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new BaseResult<Message> { Data = message };
         }
         catch (Exception ex)
         {
@@ -192,9 +199,9 @@ public class ChatService : IChatService
     {
         try
         {
-            Chat[] chats = await _chatRepository.GetAll()
-        .Where(x => x.User1 == userId || x.User2 == userId)
-        .ToArrayAsync();
+            Chat[] chats = await _chatRepository.GetAll().
+                Where(x => x.User1 == userId || x.User2 == userId).
+                ToArrayAsync();
 
             if (!chats.IsNotNullOrEmpty())
             {
@@ -223,21 +230,19 @@ public class ChatService : IChatService
         {
             var lastMessage = await _messageRepository.GetAll().
                             Where(x => x.ChatId == chatId).
-                            LastOrDefaultAsync();
+                            OrderByDescending(x => x.CreatedAt).
+                            FirstOrDefaultAsync();
 
-            if (lastMessage != null)
+            if (lastMessage == null)
             {
-                return new BaseResult<Message>()
+                return new BaseResult<Message>
                 {
-                    Data = lastMessage
+                    ErrorMessage = ErrorMessage.MessageNotFound,
+                    ErrorCode = (int)ErrorChatCodes.MessageNotFound
                 };
             }
 
-            return new BaseResult<Message>()
-            {
-                ErrorMessage = ErrorMessage.MessageNotFound,
-                ErrorCode = (int)ErrorChatCodes.MessageNotFound
-            };
+            return new BaseResult<Message> { Data = lastMessage };
         }
         catch (Exception ex)
         {
@@ -249,17 +254,18 @@ public class ChatService : IChatService
     {
         try
         {
-            Message[] messages = await _messageRepository.GetAll()
-             .Where(x => x.ChatId == chatId).ToArrayAsync();
+            Message[] messages = await _messageRepository.GetAll().
+                                    Where(x => x.ChatId == chatId).
+                                    OrderBy(x => x.CreatedAt).
+                                    ToArrayAsync();
 
-            if (!messages.IsNotNullOrEmpty())
+            if (messages.IsNullOrEmpty())
             {
                 return new CollectionResult<Message>()
                 {
                     ErrorMessage = ErrorMessage.MessageNotFound,
                     ErrorCode = (int)ErrorChatCodes.MessageNotFound
                 };
-
             }
 
             return new CollectionResult<Message>

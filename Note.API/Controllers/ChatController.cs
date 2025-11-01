@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Note.Domain.Dto.ChatDto;
 using Note.Domain.Entity.ChatEntity;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
@@ -21,9 +22,9 @@ public class ChatController : ControllerBase
 
     #region Получение чатов и сообщений
     /// <summary>
-    /// Метод получения чатов
+    /// Метод получения чатов.
     /// </summary>
-    /// <param name="userId">Id юзера</param>
+    /// <param name="userId">Id юзера.</param>
     [HttpGet("GetChats/{userId}")]
     public async Task<ActionResult<CollectionResult<Chat>>> GetChats(long userId)
     {
@@ -38,11 +39,11 @@ public class ChatController : ControllerBase
     }
 
     /// <summary>
-    /// Метод получения последнего сообщения
+    /// Метод получения последнего сообщения.
     /// </summary>
-    /// <param name="chatId">Id чата</param>
+    /// <param name="chatId">Id чата.</param>
     [HttpGet("GetLastMessage/{chatId}")]
-    public async Task<ActionResult<BaseResult<Chat>>> GetLastMessage(long chatId)
+    public async Task<ActionResult<BaseResult<Message>>> GetLastMessage(long chatId)
     {
         var response = await _chatService.GetLastMessage(chatId);
 
@@ -55,11 +56,11 @@ public class ChatController : ControllerBase
     }
 
     /// <summary>
-    /// Метод получения сообщения
+    /// Метод получения сообщения.
     /// </summary>
-    /// <param name="chatId">Id чата</param>
+    /// <param name="chatId">Id чата.</param>
     [HttpGet("GetMessages/{chatId}")]
-    public async Task<ActionResult<CollectionResult<Chat>>> GetMessages(long chatId)
+    public async Task<ActionResult<CollectionResult<Message>>> GetMessages(long chatId)
     {
         var response = await _chatService.GetMessages(chatId);
 
@@ -73,11 +74,11 @@ public class ChatController : ControllerBase
     #endregion
 
     /// <summary>
-    /// Метод удаления чата у пользователя
+    /// Метод удаления чата у пользователя.
     /// </summary>
-    /// <param name="chatId">Id чата</param>
-    [HttpGet("DeleteChat/{chatId}")]
-    public async Task<ActionResult<BaseResult<Message>>> DeleteChat(long chatId)
+    /// <param name="chatId">Id чата.</param>
+    [HttpDelete("DeleteChat/{chatId}")]
+    public async Task<ActionResult<BaseResult<bool>>> DeleteChat(long chatId)
     {
         var response = await _chatService.DeleteChat(chatId);
 
@@ -89,4 +90,39 @@ public class ChatController : ControllerBase
         return BadRequest(response);
     }
 
+    /// <summary>
+    /// Метод создания сообщения.
+    /// </summary>
+    /// <param name="dto">Дто создания сообщения.</param>
+    /// <returns>Созданное сообщение.</returns>
+    [HttpPost("CreateMessage")]
+    public async Task<ActionResult<BaseResult<Message>>> CreateMessage([FromBody] CreateMessageDto dto)
+    {
+        var response = await _chatService.CreateMessage(dto);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
+
+    /// <summary>
+    /// Метод редактирования сообщения.
+    /// </summary>
+    /// <param name="dto">Дто редактирования сообщения.</param>
+    /// <returns>Отредактированное сообщение.</returns>
+    [HttpPost("EditMessage")]
+    public async Task<ActionResult<BaseResult<Message>>> EditMessage([FromBody] EditMessageDto dto)
+    {
+        var response = await _chatService.EditMessage(dto);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
 }

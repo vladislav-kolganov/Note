@@ -12,5 +12,10 @@ public class ChatConfigurations : IEntityTypeConfiguration<Chat>
         builder.Property(x => x.User1).IsRequired();
         builder.Property(x => x.User2).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasMany(c => c.Messages)
+               .WithOne(m => m.Chat)
+               .HasForeignKey(m => m.ChatId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

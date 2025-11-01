@@ -20,7 +20,7 @@ public class Message : IEntityId<long>
     /// <summary>
     /// Поддержка фотографий в сообщении
     /// </summary>
-    public List<byte[]>? Photo { get; set; }
+    public List<MessagePhoto> Photos { get; set; } = new();
 
     /// <summary>
     /// Id пользователя, который отправил сообщение

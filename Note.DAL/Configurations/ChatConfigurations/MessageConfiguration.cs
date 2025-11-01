@@ -14,5 +14,10 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
         builder.Property(x => x.ConsumerMessageId).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
+        builder.HasMany(message => message.Photos).
+                WithOne(messagePhoto => messagePhoto.Message).
+                HasForeignKey(messagePhoto => messagePhoto.MessageId).
+                OnDelete(DeleteBehavior.Cascade);
+
     }
 }
