@@ -14,6 +14,9 @@ using Note.Domain.Result;
 
 namespace Note.Application.Services;
 
+/// <summary>
+/// Сервис чата.
+/// </summary>
 public class ChatService : IChatService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -40,7 +43,7 @@ public class ChatService : IChatService
     {
         try
         {
-            if (dto.textMessage == null && dto.photo.IsNullOrEmpty())
+            if (dto.TextMessage == null && dto.Photo.IsNullOrEmpty())
             {
                 return new BaseResult<Message>()
                 {
@@ -50,10 +53,10 @@ public class ChatService : IChatService
             }
 
             var producerMessage = await _userRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.Id == dto.producerMessageId);
+                .FirstOrDefaultAsync(x => x.Id == dto.ProducerMessageId);
 
             var consumerMessage = await _userRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.Id == dto.consumerMessageId);
+                .FirstOrDefaultAsync(x => x.Id == dto.ConsumerMessageId);
 
 
             if (producerMessage == null || consumerMessage == null)
@@ -65,26 +68,26 @@ public class ChatService : IChatService
                 };
             }
 
-            Chat chat;
+            Chat? chat;
 
-            if (dto.chatId.HasValue && dto.chatId.Value >= 0)
+            if (dto.ChatId.HasValue && dto.ChatId.Value >= 0)
             {
                 chat = await _chatRepository.GetAll()
-                    .FirstOrDefaultAsync(x => x.Id == dto.chatId.Value);
+                    .FirstOrDefaultAsync(x => x.Id == dto.ChatId.Value);
             }
             else
             {
                 chat = await _chatRepository.GetAll().
                 FirstOrDefaultAsync(x =>
-                    (x.User1 == dto.producerMessageId && x.User2 == dto.consumerMessageId) ||
-                    (x.User1 == dto.consumerMessageId && x.User2 == dto.producerMessageId));
+                    (x.User1 == dto.ProducerMessageId && x.User2 == dto.ConsumerMessageId) ||
+                    (x.User1 == dto.ConsumerMessageId && x.User2 == dto.ProducerMessageId));
             }
-            if (chat == null)
+            if (chat is null)
             {
                 chat = new Chat()
                 {
-                    User1 = dto.producerMessageId,
-                    User2 = dto.consumerMessageId,
+                    User1 = dto.ProducerMessageId,
+                    User2 = dto.ConsumerMessageId,
                     CreatedAt = DateTime.UtcNow,
                 };
 
@@ -95,14 +98,14 @@ public class ChatService : IChatService
             var message = new Message()
             {
                 ChatId = chat.Id,
-                TextMessage = dto.textMessage,
-                ProducerMessageId = dto.producerMessageId,
-                ConsumerMessageId = dto.consumerMessageId,
+                TextMessage = dto.TextMessage,
+                ProducerMessageId = dto.ProducerMessageId,
+                ConsumerMessageId = dto.ConsumerMessageId,
                 CreatedAt = DateTime.UtcNow
             };
-            if (dto.photo.IsNotNullOrEmpty())
+            if (dto.Photo.IsNotNullOrEmpty())
             {
-                message.Photos = dto.photo.Where(p => p.IsNotNullOrEmpty())
+                message.Photos = dto.Photo.Where(p => p.IsNotNullOrEmpty())
                     .Select(p => new MessagePhoto { Content = p })
                     .ToList();
             }
@@ -161,9 +164,9 @@ public class ChatService : IChatService
         try
         {
             var message = await _messageRepository.GetAll().
-                 FirstOrDefaultAsync(x => x.Id == dto.messageId);
+                 FirstOrDefaultAsync(x => x.Id == dto.MessageId);
 
-            if (message == null)
+            if (message is null)
             {
                 return new BaseResult<Message>
                 {
@@ -172,7 +175,7 @@ public class ChatService : IChatService
                 };
             }
 
-            if (string.IsNullOrWhiteSpace(dto.textMessage))
+            if (string.IsNullOrWhiteSpace(dto.TextMessage))
             {
                 return new BaseResult<Message>
                 {
@@ -181,7 +184,7 @@ public class ChatService : IChatService
                 };
             }
 
-            message.TextMessage = dto.textMessage;
+            message.TextMessage = dto.TextMessage;
             message.UpdatedAt = DateTime.UtcNow;
 
             _messageRepository.Update(message);

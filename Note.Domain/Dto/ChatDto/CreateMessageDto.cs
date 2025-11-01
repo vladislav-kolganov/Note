@@ -3,4 +3,4 @@
 /// <summary>
 /// Дто создания сообщения.
 /// </summary>
-public record CreateMessageDto(long? chatId, long producerMessageId, long consumerMessageId, string? textMessage, List<byte[]>? photo);
+public record CreateMessageDto(long? ChatId, long ProducerMessageId, long ConsumerMessageId, string? TextMessage, List<byte[]>? Photo);

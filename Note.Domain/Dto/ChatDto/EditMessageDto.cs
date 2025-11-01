@@ -3,6 +3,6 @@
 /// <summary>
 /// Дто редактирования сообщения.
 /// </summary>
-/// <param name="messageId">Id сообщения.</param>
-/// <param name="textMessage">Текст сообщения.</param>
-public record EditMessageDto(long messageId, string textMessage);
+/// <param name="MessageId">Id сообщения.</param>
+/// <param name="TextMessage">Текст сообщения.</param>
+public record EditMessageDto(long MessageId, string TextMessage);

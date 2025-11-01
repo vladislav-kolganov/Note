@@ -4,6 +4,9 @@ using Note.Domain.Result;
 
 namespace Note.Domain.Interfaces.Services;
 
+/// <summary>
+/// Интерфейс сервиса чата.
+/// </summary>
 public interface IChatService
 {
     /// <summary>

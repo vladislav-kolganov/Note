@@ -3,16 +3,40 @@ using Note.Domain.Result;
 
 namespace Note.Domain.Interfaces.Services;
 
-// Сервис отвечающий за работу с доменной части отчёта (Report)
+/// <summary>
+/// Сервис отвечающий за работу с доменной части отчёта (Report).
+/// </summary>
 public interface IReportService
-{   // получение всех отчётов пользователя
+
+{
+    ///Получение всех отчётов пользователя.
     Task<CollectionResult<ReportDto>> GetResultAsync(long userId);
-    // получение отчёта по идентификатору
+
+    /// <summary>
+    /// Получение отчёта по идентификатору.
+    /// </summary>
+    /// <param name="id">Id отчёта.</param>
+    /// <returns></returns>
     Task<BaseResult<ReportDto>> GetReportAsync(long id);
-    // создание отчёта с базовыми параметрами
+
+    /// <summary>
+    /// Создание отчёта с базовыми параметрами
+    /// </summary>
+    /// <param name="dto">Дто создания отчёта.</param>
+    /// <returns>Дто отчёта.</returns>
     Task<BaseResult<ReportDto>> CreateReportAsync(CreateReportDto dto);
-    // удаление отчёта по идентификатору
+
+    /// <summary>
+    /// Удаление отчёта по идентификатору.
+    /// </summary>
+    /// <param name="id">Id отчёта.</param>
+    /// <returns>Дто отчёта.</returns>
     Task<BaseResult<ReportDto>> DeleteReportAsync(long id);
-    // обновление отчёта по идентификатору
+
+    /// <summary>
+    /// Обновление отчёта по идентификатору.
+    /// </summary>
+    /// <param name="dto">Дто обновления отчёта.</param>
+    /// <returns>Дто отчёта.</returns>
     Task<BaseResult<ReportDto>> UpdateReportAsync(UpdateReportDto dto);
 }

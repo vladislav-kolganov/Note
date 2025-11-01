@@ -1,4 +1,5 @@
 using Note.API;
+using Note.API.Hubs;
 using Note.API.Middlewares;
 using Note.Application.DependencyInjection;
 using Note.DAL.DependencyInjection;
@@ -9,6 +10,11 @@ using Serilog.Sinks.Elasticsearch;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+    options.KeepAliveInterval = TimeSpan.FromMinutes(2);
+});
 
 builder.Services.AddAuthenticationAndAutorization(builder);
 builder.Services.AddSwagger();
@@ -63,5 +69,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();

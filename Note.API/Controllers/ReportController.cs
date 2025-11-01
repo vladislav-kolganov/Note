@@ -10,20 +10,22 @@ namespace Note.API.Controllers;
 //[Authorize]
 [AllowAnonymous]
 [ApiVersion("1.0")]
-[Route("[controller]")] // путь до контроллера
+[Route("[controller]")]
 [ApiController]
 public class ReportController : ControllerBase
 {
     private readonly IReportService _reportService;
+
     public ReportController(IReportService reportService)
     {
         _reportService = reportService;
     }
 
     /// <summary>
-    /// Получение отчёта по Id
+    /// Получение отчёта по Id.
     /// </summary>
-    /// <param name="id">Id отчёта</param>
+    /// <param name="id">Id отчёта.</param>
+    /// <returns>Дто отчёта.</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -38,9 +40,10 @@ public class ReportController : ControllerBase
     }
 
     /// <summary>
-    /// Получение получения отчётов пользователя по Id пользователя
+    /// Получение получения отчётов пользователя по Id пользователя.
     /// </summary>
-    /// <param name="userId">Id пользователя</param>
+    /// <param name="userId">Id пользователя.</param>
+    /// <returns>Дто отчёта.</returns>
     [HttpGet("reports/{userId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -55,10 +58,10 @@ public class ReportController : ControllerBase
     }
 
     /// <summary>
-    /// Удаление отчёта по
+    /// Удаление отчёта по Id.
     /// </summary>
-    /// <param name="reportId"></param>
-    /// <returns></returns>
+    /// <param name="reportId">Id отчёта.</param>
+    /// <returns>Дто удаленного отчёта.</returns>
     [HttpDelete("{reportId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -73,9 +76,9 @@ public class ReportController : ControllerBase
     }
 
     /// <summary>
-    /// 
+    /// Создать отчёт.
     /// </summary>
-    /// <param name="reportDto"></param>
+    /// <param name="reportDto">Дто создания отчёта.</param>
     /// <remarks> 
     /// Request for create report
     /// Post { 
@@ -83,12 +86,10 @@ public class ReportController : ControllerBase
     ///       "Description" : "Test description",
     ///       "userid" : 1}
     /// </remarks>
-
-
-
+    /// <returns>Дто отчёта.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]             //FromBody - означает, что считываем с тела запроса
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<ReportDto>>> CreateReport([FromBody] CreateReportDto reportDto)
     {
         var response = await _reportService.CreateReportAsync(reportDto);
@@ -99,6 +100,11 @@ public class ReportController : ControllerBase
         return BadRequest(response);
     }
 
+    /// <summary>
+    /// Обновить отчёт.
+    /// </summary>
+    /// <param name="reportDto">Дто обновления отчёта.</param>
+    /// <returns>Дто отчёта.</returns>
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

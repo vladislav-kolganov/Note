@@ -12,9 +12,8 @@ namespace Note.API
     {
      
         /// <summary>
-        /// Подключение аутентификации и авторизации
+        /// Подключение аутентификации и авторизации.
         /// </summary>
-        /// <param name="services"></param>
         public static void AddAuthenticationAndAutorization(this IServiceCollection services, WebApplicationBuilder builder)
         {
             services.AddAuthorization();
@@ -48,9 +47,8 @@ namespace Note.API
 
         }
         /// <summary>
-        /// Подключение Swager
+        /// Подключение Swager.
         /// </summary>
-        /// <param name="services"></param>
         public static void AddSwagger(this IServiceCollection services)
         {
             //services.AddApiVersioning()
