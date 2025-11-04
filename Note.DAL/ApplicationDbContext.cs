@@ -25,7 +25,7 @@ public class ApplicationDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var config = _configuration.GetSection(nameof(PostgresSettings)).Get<PostgresSettings>() ??
-            throw new ArgumentNullException(nameof(ApiPythonSettings) + " is null");
+            throw new ArgumentNullException(nameof(PostgresSettings) + " is null");
 
         optionsBuilder.UseNpgsql(config.ConnectionString);
 

@@ -1,4 +1,5 @@
 using Note.API;
+using Note.API.Clients;
 using Note.API.Hubs;
 using Note.API.Middlewares;
 using Note.Application.DependencyInjection;
@@ -36,7 +37,9 @@ builder.Host.UseSerilog((context, config) =>
     WriteTo.Console().
     WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(context.Configuration["ElkSettings:Uri"]))
     {
-        IndexFormat = $"{context.Configuration["ApplicationName:Name"]}-logs-{context.HostingEnvironment.EnvironmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+        IndexFormat = $"{context.Configuration["ApplicationName:Name"]}-logs-" +
+        $"{context.HostingEnvironment.EnvironmentName?.
+        ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
         AutoRegisterTemplate = true
     }).
     Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName).
@@ -44,6 +47,14 @@ builder.Host.UseSerilog((context, config) =>
 
 });
 
+builder.Services.AddHttpClient<IAiServiceClient, AiServiceClient>(client =>
+{
+    client.BaseAddress = new Uri("http://aiservice.api:5435/");
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+
+
+builder.Services.AddHealthChecks();
 builder.Services.AddApplication();
 
 var app = builder.Build();
@@ -70,5 +81,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
+app.MapHealthChecks("/health");
 
 app.Run();

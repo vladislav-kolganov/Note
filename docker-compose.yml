@@ -28,6 +28,7 @@ services:
       - "5432:5432"
     networks:                
       - elk
+      - sharednet 
 
   elasticsearch:
     image: elasticsearch:9.2.0
@@ -59,7 +60,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus:/etc/prometheus:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
@@ -80,4 +81,6 @@ services:
 
 networks: 
     elk:
-       driver: bridge  
+       driver: bridge
+    sharednet:
+       external: true

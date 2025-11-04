@@ -26,6 +26,4 @@ public interface IBaseRepository<TEntity> : IStateSaveChanges
     /// </summary>
     /// <param name="entity">Сущность.</param>
     void Remove(TEntity entity);
-
-
 }
