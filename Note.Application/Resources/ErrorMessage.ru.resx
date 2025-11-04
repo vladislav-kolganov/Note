@@ -165,4 +165,7 @@
   <data name="MessageIsEmpty" xml:space="preserve">
     <value>Пустое сообщение</value>
   </data>
+  <data name="AiAssistantReturnError" xml:space="preserve">
+    <value>Умный помощник вернул ошибку</value>
+  </data>
 </root>

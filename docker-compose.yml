@@ -17,6 +17,8 @@ services:
       - ApplicationName__Name=note
     networks:                
       - elk
+      - sharednet 
+  
   db:
     image: postgres:15-alpine
     container_name: postgre
@@ -28,7 +30,6 @@ services:
       - "5432:5432"
     networks:                
       - elk
-      - sharednet 
 
   elasticsearch:
     image: elasticsearch:9.2.0

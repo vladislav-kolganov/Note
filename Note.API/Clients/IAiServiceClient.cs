@@ -1,4 +1,5 @@
 ﻿using Note.Domain.Dto.AiChatDto;
+using Note.Domain.Result;
 
 namespace Note.API.Clients;
 
@@ -13,5 +14,5 @@ public interface IAiServiceClient
     /// <param name="dto">Дто запроса.</param>
     /// <param name="ct">CancellationToken.</param>
     /// <returns>Дто ответа.</returns>
-    Task<ChatResponseDto> AskLlamaAsync(ChatRequestDto dto, CancellationToken ct = default);
+    Task<BaseResult<ChatResponseDto>> AskLlamaAsync(ChatRequestDto dto, CancellationToken ct = default);
 }

@@ -165,4 +165,7 @@
   <data name="MessageIsEmpty" xml:space="preserve">
     <value>MessageIsEmpty</value>
   </data>
+  <data name="AiAssistantReturnError" xml:space="preserve">
+    <value>AiAssistantReturnError</value>
+  </data>
 </root>

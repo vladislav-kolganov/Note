@@ -49,7 +49,7 @@ builder.Host.UseSerilog((context, config) =>
 
 builder.Services.AddHttpClient<IAiServiceClient, AiServiceClient>(client =>
 {
-    client.BaseAddress = new Uri("http://aiservice.api:5435/");
+    client.BaseAddress = new Uri("http://aiservice:5435");
     client.Timeout = TimeSpan.FromSeconds(15);
 });
 

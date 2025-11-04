@@ -1,7 +1,7 @@
 ﻿namespace Note.Domain.Enum;
 
 /// <summary>
-/// Ошибки чата
+/// Ошибки чата.
 /// </summary>
 public enum ErrorChatCodes
 {
@@ -9,4 +9,6 @@ public enum ErrorChatCodes
 
     MessageNotFound = 1,
     MessageIsEmpty = 2,
+
+    AiAssistantReturnError = 10
 }
