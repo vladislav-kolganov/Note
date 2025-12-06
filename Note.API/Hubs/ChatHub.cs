@@ -23,7 +23,7 @@ public class ChatHub : Hub
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, chatId.ToString());
 
-        var messagesResult = await _chatService.GetMessages(chatId);
+        var messagesResult = await _chatService.GetMessagesAsync(chatId);
 
         if (messagesResult.IsSuccess)
         {
@@ -50,7 +50,7 @@ public class ChatHub : Hub
     /// </summary>
     public async Task CreateMessage(CreateMessageDto dto)
     {
-        var result = await _chatService.CreateMessage(dto);
+        var result = await _chatService.CreateMessageAsync(dto);
 
         if (!result.IsSuccess)
         {

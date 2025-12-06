@@ -1,4 +1,5 @@
-﻿using Note.Domain.Dto.UserDto;
+﻿using Note.Domain.Dto.ChatDto;
+using Note.Domain.Dto.UserDto;
 using Note.Domain.Result;
 
 namespace Note.Domain.Interfaces.Services;
@@ -27,4 +28,11 @@ public interface IUserService
     /// <param name="id">Id пользователя</param>
     /// <returns></returns>
     Task<BaseResult<UserDto>> Delete(long id);
+
+    /// <summary>
+    /// Поиск пользователя по логину.
+    /// </summary>
+    /// <param name="login">Логин пользоваетеля.</param>
+    /// <returns>Пользователи с похожим логином</returns>
+    Task<CollectionResult<UserFindDto>> FindUsersAsync(string login);
 }

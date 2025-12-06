@@ -168,4 +168,10 @@
   <data name="AiAssistantReturnError" xml:space="preserve">
     <value>AiAssistantReturnError</value>
   </data>
+  <data name="UserLoginIsEmpty" xml:space="preserve">
+    <value>User login is empty</value>
+  </data>
+  <data name="CouldntCreateAchat" xml:space="preserve">
+    <value>Couldn't create a chat</value>
+  </data>
 </root>

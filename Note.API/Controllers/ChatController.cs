@@ -30,7 +30,7 @@ public class ChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CollectionResult<Chat>>> GetChats(long userId)
     {
-        var response = await _chatService.GetChats(userId);
+        var response = await _chatService.GetChatsAsync(userId);
 
         if (response.IsSuccess)
         {
@@ -49,7 +49,7 @@ public class ChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<Message>>> GetLastMessage(long chatId)
     {
-        var response = await _chatService.GetLastMessage(chatId);
+        var response = await _chatService.GetLastMessageAsync(chatId);
 
         if (response.IsSuccess)
         {
@@ -68,7 +68,7 @@ public class ChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CollectionResult<Message>>> GetMessages(long chatId)
     {
-        var response = await _chatService.GetMessages(chatId);
+        var response = await _chatService.GetMessagesAsync(chatId);
 
         if (response.IsSuccess)
         {
@@ -80,6 +80,26 @@ public class ChatController : ControllerBase
     #endregion
 
     /// <summary>
+    /// Метод поиска или создания чата.
+    /// </summary>
+    /// <param name="dto">Дто создания чата.</param>
+    /// <returns>Найденный или созданный чат.</returns>
+    [HttpPost("find-or-create-chat")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BaseResult<Chat>>> FindOrCreateChat([FromBody] UserCreateChatDto dto)
+    {
+        var response = await _chatService.FindOrCreateChatAsync(dto);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
+
+    /// <summary>
     /// Метод удаления чата у пользователя.
     /// </summary>
     /// <param name="chatId">Id чата.</param>
@@ -88,7 +108,7 @@ public class ChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<bool>>> DeleteChat(long chatId)
     {
-        var response = await _chatService.DeleteChat(chatId);
+        var response = await _chatService.DeleteChatAsync(chatId);
 
         if (response.IsSuccess)
         {
@@ -108,7 +128,7 @@ public class ChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<Message>>> CreateMessage([FromBody] CreateMessageDto dto)
     {
-        var response = await _chatService.CreateMessage(dto);
+        var response = await _chatService.CreateMessageAsync(dto);
 
         if (response.IsSuccess)
         {
@@ -128,7 +148,7 @@ public class ChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<Message>>> EditMessage([FromBody] EditMessageDto dto)
     {
-        var response = await _chatService.EditMessage(dto);
+        var response = await _chatService.EditMessageAsync(dto);
 
         if (response.IsSuccess)
         {

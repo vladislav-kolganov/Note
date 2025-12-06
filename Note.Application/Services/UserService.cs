@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
+using Note.Application.Services.Extensions;
 using Note.Application.Services.Helpers;
+using Note.Domain.Dto.ChatDto;
 using Note.Domain.Dto.UserDto;
 using Note.Domain.Entity;
 using Note.Domain.Enum;
@@ -140,6 +142,43 @@ public class UserService : IUserService
             ErrorMessage = ErrorMessage.InternalServerError,
             ErrorCode = (int)ErrorCodes.InternalServerError
         };
+    }
+
+    public async Task<CollectionResult<UserFindDto>> FindUsersAsync(string login)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(login))
+            {
+                return new CollectionResult<UserFindDto>()
+                {
+                    ErrorMessage = ErrorMessage.UserLoginIsEmpty,
+                    ErrorCode = (int)ErrorChatCodes.UserLoginIsEmpty
+                };
+            }
+
+            var user = await _userRepository.GetAll().Where(user => user.Login.Contains(login)).
+                                             ToArrayAsync();
+            if (user.IsNullOrEmpty())
+            {
+                return new CollectionResult<UserFindDto>()
+                {
+                    ErrorMessage = ErrorMessage.UserNotFound,
+                    ErrorCode = (int)ErrorCodes.UserNotFound
+                };
+            }
+            var dto = user.Select(x => new UserFindDto(x.Login, x.Id)).ToList();
+
+            return new CollectionResult<UserFindDto>()
+            {
+                Data = dto,
+                Count = dto.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<UserFindDto>.LogExceptionForCollection(ex.Message, _logger);
+        }
     }
 
     /// <summary>

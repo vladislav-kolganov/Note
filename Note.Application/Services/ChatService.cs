@@ -39,7 +39,59 @@ public class ChatService : IChatService
         _logger = logger;
     }
 
-    public async Task<BaseResult<Message>> CreateMessage(CreateMessageDto dto)
+    public async Task<BaseResult<Chat>> FindOrCreateChatAsync(UserCreateChatDto dto)
+    {
+        try
+        {
+            if (dto == null)
+            {
+                return new BaseResult<Chat>()
+                {
+                    ErrorMessage = ErrorMessage.InvalidClientRequest,
+                    ErrorCode = (int)ErrorCodes.InvalidClientRequest
+                };
+            }
+
+            Chat? chat;
+
+            if (dto.IdChat.HasValue && dto.IdChat.Value >= 0)
+            {
+                chat = await _chatRepository.GetAll()
+                    .FirstOrDefaultAsync(x => x.Id == dto.IdChat.Value);
+            }
+            else
+            {
+                chat = _chatRepository.GetAll().
+                FirstOrDefault(x =>
+                    (x.User1 == dto.IdUser1 && x.User2 == dto.IdUser2)
+                    || (x.User1 == dto.IdUser2 && x.User2 == dto.IdUser1)
+                );
+            }
+            if (chat is null)
+            {
+                chat = new Chat()
+                {
+                    User1 = dto.IdUser1,
+                    User2 = dto.IdUser2,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                await _chatRepository.CreateAsync(chat);
+                await _unitOfWork.SaveChangeAsync();
+            }
+
+            return new BaseResult<Chat>()
+            {
+                Data = chat,
+            };
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<Chat>.LogException(ex.Message, _logger);
+        }
+    }
+
+    public async Task<BaseResult<Message>> CreateMessageAsync(CreateMessageDto dto)
     {
         try
         {
@@ -68,36 +120,22 @@ public class ChatService : IChatService
                 };
             }
 
-            Chat? chat;
-
-            if (dto.ChatId.HasValue && dto.ChatId.Value >= 0)
+            var chat = await FindOrCreateChatAsync(new UserCreateChatDto(dto.ProducerMessageId, dto.ConsumerMessageId, dto.ChatId));
+            if (!chat.IsSuccess)
             {
-                chat = await _chatRepository.GetAll()
-                    .FirstOrDefaultAsync(x => x.Id == dto.ChatId.Value);
-            }
-            else
-            {
-                chat = await _chatRepository.GetAll().
-                FirstOrDefaultAsync(x =>
-                    (x.User1 == dto.ProducerMessageId && x.User2 == dto.ConsumerMessageId) ||
-                    (x.User1 == dto.ConsumerMessageId && x.User2 == dto.ProducerMessageId));
-            }
-            if (chat is null)
-            {
-                chat = new Chat()
+                if (producerMessage == null || consumerMessage == null)
                 {
-                    User1 = dto.ProducerMessageId,
-                    User2 = dto.ConsumerMessageId,
-                    CreatedAt = DateTime.UtcNow,
-                };
-
-                await _chatRepository.CreateAsync(chat);
-                await _unitOfWork.SaveChangeAsync();
+                    return new BaseResult<Message>()
+                    {
+                        ErrorMessage = ErrorMessage.CouldntCreateAchat,
+                        ErrorCode = (int)ErrorChatCodes.CouldntCreateAchat,
+                    };
+                }
             }
 
             var message = new Message()
             {
-                ChatId = chat.Id,
+                ChatId = chat.Data.Id,
                 TextMessage = dto.TextMessage,
                 ProducerMessageId = dto.ProducerMessageId,
                 ConsumerMessageId = dto.ConsumerMessageId,
@@ -129,7 +167,7 @@ public class ChatService : IChatService
     /// </summary>
     /// <param name="chatId">Id чата </param>
     /// <param name="userId">Id пользователя</param>
-    public async Task<BaseResult<bool>> DeleteChat(long chatId)
+    public async Task<BaseResult<bool>> DeleteChatAsync(long chatId)
     {
         try
         {
@@ -159,7 +197,7 @@ public class ChatService : IChatService
         }
     }
 
-    public async Task<BaseResult<Message>> EditMessage(EditMessageDto dto)
+    public async Task<BaseResult<Message>> EditMessageAsync(EditMessageDto dto)
     {
         try
         {
@@ -198,7 +236,7 @@ public class ChatService : IChatService
         }
     }
 
-    public async Task<CollectionResult<Chat>> GetChats(long userId)
+    public async Task<CollectionResult<Chat>> GetChatsAsync(long userId)
     {
         try
         {
@@ -227,7 +265,7 @@ public class ChatService : IChatService
         }
     }
 
-    public async Task<BaseResult<Message>> GetLastMessage(long chatId)
+    public async Task<BaseResult<Message>> GetLastMessageAsync(long chatId)
     {
         try
         {
@@ -253,7 +291,7 @@ public class ChatService : IChatService
         }
     }
 
-    public async Task<CollectionResult<Message>> GetMessages(long chatId)
+    public async Task<CollectionResult<Message>> GetMessagesAsync(long chatId)
     {
         try
         {

@@ -74,4 +74,23 @@ public class UserController : ControllerBase
 
         return BadRequest(response);
     }
+
+    /// <summary>
+    /// Эндпоинт поиска пользователей по логину.
+    /// </summary>
+    /// <param name="login"> Логин пользователя</param>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BaseResult<UserDto>>> FindUserAsync(string login)
+    {
+        var response = await _userService.FindUsersAsync(login);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
 }

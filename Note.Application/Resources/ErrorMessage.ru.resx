@@ -168,4 +168,10 @@
   <data name="AiAssistantReturnError" xml:space="preserve">
     <value>Умный помощник вернул ошибку</value>
   </data>
+  <data name="UserLoginIsEmpty" xml:space="preserve">
+    <value>Введенный логин пользователя пуст</value>
+  </data>
+  <data name="CouldntCreateAchat" xml:space="preserve">
+    <value>Не удалось создать чат</value>
+  </data>
 </root>
