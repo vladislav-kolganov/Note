@@ -70,6 +70,7 @@ if (app.Environment.IsDevelopment())
         op.RoutePrefix = string.Empty;
     });
 }
+
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseMetricServer();

@@ -15,6 +15,12 @@ services:
       - PostgresSettings__Schema=chat
       - ElkSettings__Uri=http://elasticsearch:9200
       - ApplicationName__Name=note
+      - JwtSettings__Issuer=note
+      - JwtSettings__Audience=note
+      - JwtSettings__Authority=note
+      - JwtSettings__JwtKey=KNGjkrngkjreg0sdfddyjfyjugyijuthdgxrftygukyhjnbcfxvdfbgnh1234tb
+      - JwtSettings__Lifetime=15
+      - JwtSettings__RefreshTokenValidityInDays=7
     networks:                
       - elk
       - sharednet 

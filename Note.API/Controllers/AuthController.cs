@@ -36,6 +36,7 @@ public class AuthController : Controller
 
         return BadRequest(response);
     }
+
     /// <summary>
     /// Контроллер для логина пользователя
     /// </summary>

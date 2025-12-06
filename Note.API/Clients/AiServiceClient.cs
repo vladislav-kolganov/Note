@@ -17,7 +17,8 @@ public class AiServiceClient : IAiServiceClient
         _http = http;
         _logger = logger;
     }
-
+    
+    /// <inheritdoc/>
     public async Task<BaseResult<ChatResponseDto>> AskLlamaAsync(ChatRequestDto dto, CancellationToken ct = default)
     {
         try

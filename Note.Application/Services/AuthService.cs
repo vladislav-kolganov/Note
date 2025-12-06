@@ -121,7 +121,8 @@ public class AuthService : IAuthService
                 Data = new TokenDto()
                 {
                     RefreshToken = refreshToken,
-                    AccessToken = accessToken
+                    AccessToken = accessToken,
+                    UserId = user.Id
                 }
             };
         }
