@@ -133,6 +133,15 @@ namespace Note.Application.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Введенные id сообщений пустые.
+        /// </summary>
+        internal static string MessagesIdsIsEmpty {
+            get {
+                return ResourceManager.GetString("MessagesIdsIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пароль не верный.
         /// </summary>
         internal static string PasswordIsWrong {

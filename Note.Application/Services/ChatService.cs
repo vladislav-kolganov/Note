@@ -39,6 +39,65 @@ public class ChatService : IChatService
         _logger = logger;
     }
 
+    public async Task<CollectionResult<ChatListItemDto>> GetChatListAsync(long userId)
+    {
+        try
+        {
+            var chats = await _chatRepository.GetAll().Where(x => x.User1 == userId || x.User2 == userId).
+                                              ToListAsync();
+            if (chats.IsNullOrEmpty())
+            {
+                return new CollectionResult<ChatListItemDto>()
+                {
+                    ErrorMessage = ErrorMessage.ChatNotFound,
+                    ErrorCode = (int)ErrorChatCodes.ChatNotFound
+                };
+            }
+
+            var chatIds = chats.Select(c => c.Id).ToArray();
+            var partnerIds = chats.Select(c => c.User1 == userId ? c.User2 : c.User1).
+                                   Distinct().
+                                   ToArray();
+            var partners = await _userRepository.GetAll().Where(u => partnerIds.Contains(u.Id)).
+                                                 ToListAsync();
+
+            var partnerDict = partners.ToDictionary(u => u.Id, u => u.Login);
+
+            var messages = await _messageRepository.GetAll().Where(m => chatIds.Contains(m.ChatId)).
+                                                    OrderBy(m => m.ChatId).ThenByDescending(m => m.CreatedAt).
+                                                    ToListAsync();
+
+            var lastMessagesDict = messages.GroupBy(m => m.ChatId).ToDictionary(g => g.Key, g => g.First());
+
+            var items = chats.Select(chat =>
+            {
+                var partnerId = chat.User1 == userId ? chat.User2 : chat.User1;
+
+                partnerDict.TryGetValue(partnerId, out var login);
+                lastMessagesDict.TryGetValue(chat.Id, out var lastMessage);
+
+                return new ChatListItemDto(
+                    ChatId: chat.Id,
+                    PartnerId: partnerId,
+                    PartnerLogin: login ?? $"User {partnerId}",
+                    LastMessageText: lastMessage?.TextMessage,
+                    LastMessageCreatedAt: lastMessage?.CreatedAt
+                );
+            }).ToList();
+
+            return new CollectionResult<ChatListItemDto>
+            {
+                Data = items,
+                Count = items.Count
+            };
+
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<ChatListItemDto>.LogExceptionForCollection(ex.Message, _logger);
+        }
+    }
+
     public async Task<BaseResult<Chat>> FindOrCreateChatAsync(UserCreateChatDto dto)
     {
         try
@@ -318,6 +377,47 @@ public class ChatService : IChatService
         catch (Exception ex)
         {
             return LogErrorHelper<Message>.LogExceptionForCollection(ex.Message, _logger);
+        }
+    }
+
+    public async Task<BaseResult<bool>> DeleteMessagesAsync(long userId, params long[] messageIds)
+    {
+        if (messageIds.IsNullOrEmpty())
+        {
+            return new BaseResult<bool>
+            {
+                ErrorMessage = ErrorMessage.MessagesIdsIsEmpty,
+                ErrorCode = (int)ErrorChatCodes.MessagesIdsIsEmpty
+            };
+        }
+      
+        try
+        {
+            var rowsAffected = await _messageRepository.GetAll()
+                .Where(x => messageIds.Contains(x.Id) && x.ProducerMessageId == userId)
+                .ExecuteDeleteAsync();
+
+            if (rowsAffected == 0)
+            {
+                return new BaseResult<bool>
+                {
+                    ErrorMessage = ErrorMessage.MessageNotFound,
+                    ErrorCode = (int)ErrorChatCodes.MessageNotFound
+                };
+            }
+
+            return new BaseResult<bool>
+            {
+                Data = true
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResult<bool>
+            {
+                ErrorMessage = ErrorMessage.InternalServerError,
+                ErrorCode = (int)ErrorCodes.InternalServerError,
+            };
         }
     }
 }

@@ -61,4 +61,19 @@ public interface IChatService
     /// <param name="dto">Дто для создания чата.</param>
     /// <returns>Созданный чат.Ы</returns>
     Task<BaseResult<Chat>> FindOrCreateChatAsync(UserCreateChatDto dto);
+
+    /// <summary>
+    /// Получить список чатов с дополнительной информации о пользователях и последнем сообщении.
+    /// </summary>
+    /// <param name="userId">Id пользователя.</param>
+    /// <returns>Список чатов с доп. информацией.</returns>
+    Task<CollectionResult<ChatListItemDto>> GetChatListAsync(long userId);
+
+    /// <summary>
+    /// Удаление сообщений из чата.
+    /// </summary>
+    /// <param name="userId">Id пользователя.</param>
+    /// <param name="messageIds">Id сообщений.</param>
+    /// <returns>Если удалено, возвращаем true, иначе false.</returns>
+    Task<BaseResult<bool>> DeleteMessagesAsync(long userId, params long[] messageIds);
 }

@@ -41,6 +41,25 @@ public class ChatController : ControllerBase
     }
 
     /// <summary>
+    /// Получить список чатов пользователя с логинами и последними сообщениями.
+    /// </summary>
+    /// <param name="userId">Id юзера.</param>
+    [HttpGet("chat-list/{userId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<CollectionResult<ChatListItemDto>>> GetChatList(long userId)
+    {
+        var response = await _chatService.GetChatListAsync(userId);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
+
+    /// <summary>
     /// Метод получения последнего сообщения.
     /// </summary>
     /// <param name="chatId">Id чата.</param>
@@ -149,6 +168,26 @@ public class ChatController : ControllerBase
     public async Task<ActionResult<BaseResult<Message>>> EditMessage([FromBody] EditMessageDto dto)
     {
         var response = await _chatService.EditMessageAsync(dto);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
+
+    /// <summary>
+    /// Метод удаления сообщений у пользователя в чате.
+    /// </summary>
+    /// <param name="uesrId">Id пользователя.</param>
+    /// <param name="messagesIds">Id сообщений.</param>
+    [HttpDelete("delete-messages")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BaseResult<bool>>> DeleteMessages(DeleteMessageDto dto)
+    {
+        var response = await _chatService.DeleteMessagesAsync(dto.UserId, dto.MessageIds);
 
         if (response.IsSuccess)
         {

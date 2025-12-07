@@ -10,6 +10,6 @@ public enum ErrorChatCodes
     MessageNotFound = 2,
     MessageIsEmpty = 3,
     UserLoginIsEmpty = 4,
-
+    MessagesIdsIsEmpty = 5,
     AiAssistantReturnError = 10
 }

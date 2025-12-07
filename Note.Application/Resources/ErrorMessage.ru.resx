@@ -174,4 +174,7 @@
   <data name="CouldntCreateAchat" xml:space="preserve">
     <value>Не удалось создать чат</value>
   </data>
+  <data name="MessagesIdsIsEmpty" xml:space="preserve">
+    <value>Введенные id сообщений пустые</value>
+  </data>
 </root>

@@ -174,4 +174,7 @@
   <data name="CouldntCreateAchat" xml:space="preserve">
     <value>Couldn't create a chat</value>
   </data>
+  <data name="MessagesIdsIsEmpty" xml:space="preserve">
+    <value>The entered message Ids are empty</value>
+  </data>
 </root>
