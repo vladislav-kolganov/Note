@@ -11,6 +11,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.Id).ValueGeneratedOnAdd();
         builder.Property(user => user.Login).IsRequired().HasMaxLength(120);
         builder.Property(user => user.Password).IsRequired();
+        builder.Property(user => user.Photo).HasColumnType("bytea");
+
         builder.HasMany(user => user.Reports).WithOne(report => report.User)
         .HasForeignKey(report => report.UserId)
         .HasPrincipalKey(user => user.Id);
