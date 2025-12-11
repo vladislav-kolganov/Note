@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSignalR(options =>
 {
+    options.MaximumReceiveMessageSize = 2048 * 2048;
     options.EnableDetailedErrors = true;
     options.KeepAliveInterval = TimeSpan.FromMinutes(2);
 });

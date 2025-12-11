@@ -4,6 +4,9 @@ using Note.Domain.Entity.ChatEntity;
 
 namespace Note.DAL.Configurations.ChatConfigurations;
 
+/// <summary>
+/// Настройки конфигурации модели фото в БД.
+/// </summary>
 public class MessagePhotoConfiguration : IEntityTypeConfiguration<MessagePhoto>
 {
     public void Configure(EntityTypeBuilder<MessagePhoto> builder)

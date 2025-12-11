@@ -63,9 +63,12 @@ public class ChatService : IChatService
 
             var partnerDict = partners.ToDictionary(u => u.Id, u => u.Login);
 
-            var messages = await _messageRepository.GetAll().Where(m => chatIds.Contains(m.ChatId)).
-                                                    OrderBy(m => m.ChatId).ThenByDescending(m => m.CreatedAt).
-                                                    ToListAsync();
+            var messages = await _messageRepository.
+                GetAll().
+                Where(m => chatIds.Contains(m.ChatId)).
+                Include(x => x.Photos).OrderBy(m => m.ChatId).
+                ThenByDescending(m => m.CreatedAt).
+                ToListAsync();
 
             var lastMessagesDict = messages.GroupBy(m => m.ChatId).ToDictionary(g => g.Key, g => g.First());
 
@@ -80,6 +83,7 @@ public class ChatService : IChatService
                     ChatId: chat.Id,
                     PartnerId: partnerId,
                     PartnerLogin: login ?? $"User {partnerId}",
+                    Photo: lastMessage?.Photos.ToArray(),
                     LastMessageText: lastMessage?.TextMessage,
                     LastMessageCreatedAt: lastMessage?.CreatedAt
                 );
@@ -154,7 +158,7 @@ public class ChatService : IChatService
     {
         try
         {
-            if (dto.TextMessage == null && dto.Photo.IsNullOrEmpty())
+            if (dto.TextMessage == null && dto.PhotosBase64.IsNullOrEmpty())
             {
                 return new BaseResult<Message>()
                 {
@@ -200,10 +204,11 @@ public class ChatService : IChatService
                 ConsumerMessageId = dto.ConsumerMessageId,
                 CreatedAt = DateTime.UtcNow
             };
-            if (dto.Photo.IsNotNullOrEmpty())
+            if (dto.PhotosBase64.IsNotNullOrEmpty())
             {
-                message.Photos = dto.Photo.Where(p => p.IsNotNullOrEmpty())
-                    .Select(p => new MessagePhoto { Content = p })
+                message.Photos = dto.PhotosBase64
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .Select(p => new MessagePhoto { Content = Convert.FromBase64String(p) })
                     .ToList();
             }
 
@@ -330,6 +335,7 @@ public class ChatService : IChatService
         {
             var lastMessage = await _messageRepository.GetAll().
                             Where(x => x.ChatId == chatId).
+                            Include(x => x.Photos).
                             OrderByDescending(x => x.CreatedAt).
                             FirstOrDefaultAsync();
 
@@ -354,7 +360,7 @@ public class ChatService : IChatService
     {
         try
         {
-            Message[] messages = await _messageRepository.GetAll().
+            Message[] messages = await _messageRepository.GetAll().Include(x => x.Photos).
                                     Where(x => x.ChatId == chatId).
                                     OrderBy(x => x.CreatedAt).
                                     ToArrayAsync();

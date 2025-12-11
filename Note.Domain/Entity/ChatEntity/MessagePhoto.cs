@@ -1,5 +1,10 @@
-﻿namespace Note.Domain.Entity.ChatEntity;
+﻿using System.Text.Json.Serialization;
 
+namespace Note.Domain.Entity.ChatEntity;
+
+/// <summary>
+/// Модель фото.
+/// </summary>
 public class MessagePhoto
 {
     /// <summary>
@@ -15,6 +20,7 @@ public class MessagePhoto
     /// <summary>
     /// Модель сообщения.
     /// </summary>
+    [JsonIgnore]
     public Message Message { get; set; }
 
     /// <summary>

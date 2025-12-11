@@ -54,7 +54,6 @@ public class ChatHub : Hub
 
         if (!result.IsSuccess)
         {
-            // скажем только отправителю, что не вышло
             await Clients.Caller.SendAsync("CreateMessageError",
                 result.ErrorCode,
                 result.ErrorMessage);

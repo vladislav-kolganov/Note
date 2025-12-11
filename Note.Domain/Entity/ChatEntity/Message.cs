@@ -1,4 +1,5 @@
 ﻿using Note.Domain.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace Note.Domain.Entity.ChatEntity;
 
@@ -15,7 +16,7 @@ public class Message : IEntityId<long>
     /// <summary>
     /// Текст сообщения
     /// </summary>
-    public string TextMessage { get; set; }
+    public string? TextMessage { get; set; }
 
     /// <summary>
     /// Поддержка фотографий в сообщении
@@ -40,6 +41,7 @@ public class Message : IEntityId<long>
     /// <summary>
     /// Модель чата
     /// </summary>
+    [JsonIgnore]
     public Chat Chat { get; set; }
 
     /// <summary>
