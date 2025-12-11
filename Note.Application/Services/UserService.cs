@@ -47,7 +47,7 @@ public class UserService : IUserService
     /// Метод создания пользователя.
     /// </summary>
     /// <param name="model">Модель пользователя.</param>
-    public async Task<BaseResult<UserDto>> Create(RegisterUserDto model)
+    public async Task<BaseResult<UserDto>> CreateAsync(RegisterUserDto model)
     {
         try
         {
@@ -57,18 +57,6 @@ public class UserService : IUserService
                 {
                     ErrorMessage = ErrorMessage.InvalidClientRequest,
                     ErrorCode = (int)ErrorCodes.InvalidClientRequest
-                };
-            }
-
-            var user = await _userRepository.GetAll().
-                FirstOrDefaultAsync(x => x.Login == model.Login);
-
-            if (user != null)
-            {
-                return new BaseResult<UserDto>
-                {
-                    ErrorMessage = ErrorMessage.UserAlreadyExists,
-                    ErrorCode = (int)ErrorCodes.UserAlreadyExists
                 };
             }
 
@@ -90,7 +78,7 @@ public class UserService : IUserService
     /// Метод удаления пользователя
     /// </summary>
     /// <param name="id">Id пользователя</param>
-    public async Task<BaseResult<UserDto>> Delete(long id)
+    public async Task<BaseResult<UserDto>> DeleteAsync(long id)
     {
         var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
 
@@ -181,47 +169,68 @@ public class UserService : IUserService
         }
     }
 
-    /// <summary>
-    /// Метод обновления пользователя
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    public async Task<BaseResult<UserDto>> Update(UserDto model)
+    public async Task<BaseResult<UpdateOrDeletePhotoDto>> UpdateOrDeletePhotoAsync(UpdateOrDeletePhotoDto model)
     {
+        if (model.Login.IsNullOrEmpty())
+        {
+            return new BaseResult<UpdateOrDeletePhotoDto>
+            {
+                ErrorMessage = ErrorMessage.UserLoginIsEmpty,
+                ErrorCode = (int)ErrorChatCodes.UserLoginIsEmpty
+            };
+        }
+
         try
         {
-            if (model == null)
+            var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Login == model.Login);
+            if (user is null)
             {
-                return new BaseResult<UserDto>
+                return new BaseResult<UpdateOrDeletePhotoDto>
                 {
-                    ErrorMessage = ErrorMessage.InvalidClientRequest,
-                    ErrorCode = (int)ErrorCodes.InvalidClientRequest
+                    ErrorMessage = ErrorMessage.UserLoginIsEmpty,
+                    ErrorCode = (int)ErrorChatCodes.UserLoginIsEmpty
                 };
             }
 
-            var user = await _userRepository.GetAll().
-                FirstOrDefaultAsync(x => x.Login == model.Login);
+            user.Photo = Convert.FromBase64String(model.Photo);
 
-            if (user == null)
+            _unitOfWork.Users.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new BaseResult<UpdateOrDeletePhotoDto>
             {
-                return new BaseResult<UserDto>
+                Data = model
+            };
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<UpdateOrDeletePhotoDto>.LogException(ex.Message, _logger);
+        }
+    }
+
+    public async Task<BaseResult<GetInfoUserDto>> GetUserByIdAsync(long id)
+    {
+        try
+        {
+            var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user is null)
+            {
+                return new BaseResult<GetInfoUserDto>()
                 {
                     ErrorMessage = ErrorMessage.UserNotFound,
                     ErrorCode = (int)ErrorCodes.UserNotFound
                 };
             }
 
-            _userRepository.Update(user);
-            await _unitOfWork.SaveChangeAsync();
-
-            return new BaseResult<UserDto>
+            return new BaseResult<GetInfoUserDto>
             {
-                Data = _mapper.Map<UserDto>(user)
+                Data = new GetInfoUserDto(user.Id, user.Login, user?.Photo)
             };
         }
         catch (Exception ex)
         {
-            return LogErrorHelper<UserDto>.LogException(ex.Message, _logger);
+            return LogErrorHelper<GetInfoUserDto>.LogException(ex.Message, _logger);
         }
     }
 }

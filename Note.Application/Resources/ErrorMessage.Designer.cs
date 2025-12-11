@@ -19,7 +19,7 @@ namespace Note.Application.Resources {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ErrorMessage {
@@ -138,6 +138,15 @@ namespace Note.Application.Resources {
         internal static string MessagesIdsIsEmpty {
             get {
                 return ResourceManager.GetString("MessagesIdsIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Старый пароль не совпадает с введенным.
+        /// </summary>
+        internal static string OldPasswordNotEqualEntryPassword {
+            get {
+                return ResourceManager.GetString("OldPasswordNotEqualEntryPassword", resourceCulture);
             }
         }
         

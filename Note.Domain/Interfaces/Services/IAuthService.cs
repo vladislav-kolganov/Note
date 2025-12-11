@@ -22,4 +22,9 @@ public interface IAuthService
     /// <param name="dto">Дто авторизации пользователя.</param>
     Task<BaseResult<TokenDto>> Login(LoginUserDto dto);
 
+    /// <summary>
+    /// Метод смены пароля.
+    /// </summary>
+    /// <param name="model">Дто смены пароля.</param>
+    Task<BaseResult<ResetPasswordUserDto>> ResetPasswordAsync(ResetPasswordUserDto model);
 }

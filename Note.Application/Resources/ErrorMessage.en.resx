@@ -177,4 +177,7 @@
   <data name="MessagesIdsIsEmpty" xml:space="preserve">
     <value>The entered message Ids are empty</value>
   </data>
+  <data name="OldPasswordNotEqualEntryPassword" xml:space="preserve">
+    <value>The entered password not equal old password</value>
+  </data>
 </root>

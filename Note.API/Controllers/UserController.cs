@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<UserDto>>> Create([FromBody] RegisterUserDto model)
     {
-        var response = await _userService.Create(model);
+        var response = await _userService.CreateAsync(model);
 
         if (response.IsSuccess)
         {
@@ -38,15 +38,15 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Эндпоинт обновления пользователя
+    /// Эндпоинт обновления/удаления у пользователя фотографии.
     /// </summary>
-    /// <param name="model">Модель пользователя</param>
+    /// <param name="model">Модель UpdateOrDeletePhotoDto.</param>
     [HttpPatch]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<BaseResult<UserDto>>> Update([FromBody] UserDto model)
+    public async Task<ActionResult<BaseResult<UserDto>>> UpdateOrDeletePhotoAsync(UpdateOrDeletePhotoDto model)
     {
-        var response = await _userService.Update(model);
+        var response = await _userService.UpdateOrDeletePhotoAsync(model);
 
         if (response.IsSuccess)
         {
@@ -65,7 +65,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<UserDto>>> Delete(long id)
     {
-        var response = await _userService.Delete(id);
+        var response = await _userService.DeleteAsync(id);
 
         if (response.IsSuccess)
         {
@@ -78,13 +78,32 @@ public class UserController : ControllerBase
     /// <summary>
     /// Эндпоинт поиска пользователей по логину.
     /// </summary>
-    /// <param name="login"> Логин пользователя</param>
+    /// <param name="login"> Логин пользователя.</param>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<UserDto>>> FindUserAsync(string login)
     {
         var response = await _userService.FindUsersAsync(login);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
+
+    /// <summary>
+    /// Эндпоинт поиска пользователей по логину.
+    /// </summary>>
+    /// <param name="id"> Id пользователя.</param>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BaseResult<UserDto>>> GetUserByIdAsync(long id)
+    {
+        var response = await _userService.GetUserByIdAsync(id);
 
         if (response.IsSuccess)
         {

@@ -21,6 +21,7 @@ services:
       - JwtSettings__JwtKey=KNGjkrngkjreg0sdfddyjfyjugyijuthdgxrftygukyhjnbcfxvdfbgnh1234tb
       - JwtSettings__Lifetime=15
       - JwtSettings__RefreshTokenValidityInDays=7
+      - Agora__AppId=edb4f31085744b318062926727138a71
     networks:                
       - elk
       - sharednet 

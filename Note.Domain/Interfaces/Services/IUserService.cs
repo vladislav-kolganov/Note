@@ -13,21 +13,19 @@ public interface IUserService
     /// Метод создания пользователя
     /// </summary>
     /// <param name="model">Модель пользователя</param>
-    Task<BaseResult<UserDto>> Create(RegisterUserDto model);
-
-    /// <summary>
-    /// Метод обновления пользователя
-    /// </summary>
-    /// <param name="model">Модель пользователя</param>
-    /// <returns></returns>
-    Task<BaseResult<UserDto>> Update(UserDto model);
+    Task<BaseResult<UserDto>> CreateAsync(RegisterUserDto model);
 
     /// <summary>
     /// Метод удаления пользователя
     /// </summary>
     /// <param name="id">Id пользователя</param>
-    /// <returns></returns>
-    Task<BaseResult<UserDto>> Delete(long id);
+    Task<BaseResult<UserDto>> DeleteAsync(long id);
+
+    /// <summary>
+    /// Метод обновления или удаления фото пользователя.
+    /// </summary>
+    /// <param name="login">Логин пользоваетеля.</param>
+    Task<BaseResult<UpdateOrDeletePhotoDto>> UpdateOrDeletePhotoAsync(UpdateOrDeletePhotoDto model);
 
     /// <summary>
     /// Поиск пользователя по логину.
@@ -35,4 +33,10 @@ public interface IUserService
     /// <param name="login">Логин пользоваетеля.</param>
     /// <returns>Пользователи с похожим логином</returns>
     Task<CollectionResult<UserFindDto>> FindUsersAsync(string login);
+
+    /// <summary>
+    /// Поиск пользоваетеля по id.
+    /// </summary>
+    /// <param name="id">Id пользователя.</param>
+    Task<BaseResult<GetInfoUserDto>> GetUserByIdAsync(long id);
 }

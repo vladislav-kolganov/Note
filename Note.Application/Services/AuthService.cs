@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
+using Note.Application.Services.Extensions;
 using Note.Application.Services.Helpers;
 using Note.Domain.Dto;
 using Note.Domain.Dto.UserDto;
@@ -23,7 +24,7 @@ namespace Note.Application.Services;
 public class AuthService : IAuthService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IBaseRepository<User> _userRepositoory;
+    private readonly IBaseRepository<User> _userRepository;
     private readonly IBaseRepository<UserToken> _userTokenRepository;
     private readonly IBaseRepository<Role> _roleRepository;
     private readonly IBaseRepository<UserRole> _userRoleRepository;
@@ -41,7 +42,7 @@ public class AuthService : IAuthService
         IBaseRepository<UserRole> userRoleRepository,
         IUnitOfWork unitOfWork)
     {
-        _userRepositoory = userRepositoory;
+        _userRepository = userRepositoory;
         _logger = logger;
         _mapper = mapper;
         _userTokenRepository = userTokenRepository;
@@ -55,7 +56,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            var user = await _userRepositoory.GetAll()
+            var user = await _userRepository.GetAll()
             .Include(x => x.Role)
             .FirstOrDefaultAsync(x => x.Login == dto.Login);
 
@@ -113,7 +114,7 @@ public class AuthService : IAuthService
 
             user.LastLoginDate = DateTime.UtcNow;
 
-            _userRepositoory.Update(user);
+            _userRepository.Update(user);
             await _unitOfWork.SaveChangeAsync();
 
             return new BaseResult<TokenDto>()
@@ -143,7 +144,7 @@ public class AuthService : IAuthService
             };
         }
 
-        var user = await _userRepositoory.GetAll().
+        var user = await _userRepository.GetAll().
                          FirstOrDefaultAsync(x => x.Login == dto.Login);
 
         if (user != null)
@@ -165,7 +166,7 @@ public class AuthService : IAuthService
                 {
                     Login = dto.Login,
                     Password = hashUserPassword,
-                    Photo = dto.Photo != null ? dto.Photo : Array.Empty<byte>(),
+                    Photo = dto.Photo != null ? Convert.FromBase64String(dto.Photo) : Array.Empty<byte>(),
                 };
 
                 await _unitOfWork.Users.CreateAsync(user);
@@ -208,6 +209,64 @@ public class AuthService : IAuthService
         }
 
 
+    }
+
+    /// <summary>
+    /// Метод обновления пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<BaseResult<ResetPasswordUserDto>> ResetPasswordAsync(ResetPasswordUserDto model)
+    {
+        try
+        {
+            if (model == null || model.Login.IsNullOrWhiteSpace() ||
+              (model.PasswordConfirm != model.Password))
+            {
+                return new BaseResult<ResetPasswordUserDto>
+                {
+                    ErrorMessage = ErrorMessage.InvalidClientRequest,
+                    ErrorCode = (int)ErrorCodes.InvalidClientRequest
+                };
+            }
+
+            var user = await _userRepository.GetAll().
+                             FirstOrDefaultAsync(x => x.Login == model.Login);
+
+            if (user is null)
+            {
+                return new BaseResult<ResetPasswordUserDto>
+                {
+                    ErrorMessage = ErrorMessage.UserNotFound,
+                    ErrorCode = (int)ErrorCodes.UserNotFound
+                };
+            }
+
+            var isVerifyPassword = IsVerifyPassword(user.Password, model.OldPassword);
+            
+            if (!isVerifyPassword)
+            {
+                return new BaseResult<ResetPasswordUserDto>
+                {
+                    ErrorMessage = ErrorMessage.OldPasswordNotEqualEntryPassword,
+                    ErrorCode = (int)ErrorCodes.OldPasswordNotEqualEntryPassword
+                };
+            }
+
+            user.Password = HashPassword(model.Password);
+
+             _unitOfWork.Users.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new BaseResult<ResetPasswordUserDto>
+            {
+                Data = model
+            };
+        }
+        catch (Exception ex)
+        {
+            return LogErrorHelper<ResetPasswordUserDto>.LogException(ex.Message, _logger);
+        }
     }
 
     /// <summary>

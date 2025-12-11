@@ -177,4 +177,7 @@
   <data name="MessagesIdsIsEmpty" xml:space="preserve">
     <value>Введенные id сообщений пустые</value>
   </data>
+  <data name="OldPasswordNotEqualEntryPassword" xml:space="preserve">
+    <value>Старый пароль не совпадает с введенным</value>
+  </data>
 </root>

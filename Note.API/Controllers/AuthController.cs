@@ -7,10 +7,9 @@ using Note.Domain.Result;
 namespace Note.API.Controllers;
 
 /// <summary>
-/// Контроллер для регистрации и логина
+/// Контроллер для регистрации, логина и смены пароля.
 /// </summary>
 [ApiController]
-//[Authorize(Roles="admin, moderator")]
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
@@ -21,7 +20,7 @@ public class AuthController : Controller
     }
 
     /// <summary>
-    /// Контроллер регистрации пользователя
+    /// Эндпоинт регистрации пользователя
     /// </summary>
     /// <param name="dto">dto регистрации юзера</param>
     [HttpPost("Register")]
@@ -38,7 +37,7 @@ public class AuthController : Controller
     }
 
     /// <summary>
-    /// Контроллер для логина пользователя
+    /// Эндпоинт для логина пользователя
     /// </summary>
     /// <param name="dto">dto логина юзера</param>
     [HttpPost("Login")]
@@ -53,4 +52,20 @@ public class AuthController : Controller
         return BadRequest(response);
     }
 
+    /// <summary>
+    /// Эндпоинт для смены пароля.
+    /// </summary>
+    /// <param name="dto">dto логина юзера</param>
+    [HttpPost("Password")]
+    public async Task<ActionResult<BaseResult<TokenDto>>> ResetPassword([FromBody] ResetPasswordUserDto dto)
+    {
+        var response = await _authService.ResetPasswordAsync(dto);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
 }
