@@ -98,7 +98,7 @@ public class UserController : ControllerBase
     /// Эндпоинт поиска пользователей по логину.
     /// </summary>>
     /// <param name="id"> Id пользователя.</param>
-    [HttpGet]
+    [HttpGet("get-by-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<UserDto>>> GetUserByIdAsync(long id)
