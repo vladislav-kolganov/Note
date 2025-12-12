@@ -220,13 +220,20 @@ public class AuthService : IAuthService
     {
         try
         {
-            if (model == null || model.Login.IsNullOrWhiteSpace() ||
-              (model.PasswordConfirm != model.Password))
+            if (model is null || string.IsNullOrEmpty(model.Login))
             {
                 return new BaseResult<ResetPasswordUserDto>
                 {
                     ErrorMessage = ErrorMessage.InvalidClientRequest,
                     ErrorCode = (int)ErrorCodes.InvalidClientRequest
+                };
+            }
+            if (model.PasswordConfirm != model.Password)
+            {
+                return new BaseResult<ResetPasswordUserDto>
+                {
+                    ErrorMessage = ErrorMessage.PasswordNotEqualPasswordConfirm,
+                    ErrorCode = (int)ErrorCodes.PasswordNotEqualPasswordConfirm
                 };
             }
 
