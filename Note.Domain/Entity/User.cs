@@ -3,52 +3,52 @@
 namespace Note.Domain.Entity;
 
 /// <summary>
-/// Модель пользователя
+/// Модель пользователя.
 /// </summary>
 public class User : IEntityId<long>
 {
     /// <summary>
-    /// Id пользователя
+    /// Id пользователя.
     /// </summary>
     public long Id { get; set; }
 
     /// <summary>
-    /// Логин пользователя
+    /// Логин пользователя.
     /// </summary>
     public string Login { get; set; }
 
     /// <summary>
-    /// Пароль пользователя
+    /// Пароль пользователя.
     /// </summary>
     public string Password { get; set; }
 
     /// <summary>
-    /// Последнее посещение полоьзователя
+    /// Последнее посещение полоьзователя.
     /// </summary>
     public DateTime? LastLoginDate { get; set; }
 
     /// <summary>
-    /// Фото пользователя
+    /// Фото пользователя.
     /// </summary>
     public byte[]? Photo { get; set; }
 
     /// <summary>
-    /// Токен пользователя
+    /// Токен пользователя.
     /// </summary>
     public UserToken UserToken { get; set; }
 
     /// <summary>
-    /// Отчёт пользователя
+    /// Отчёт пользователя.
     /// </summary>
     public List<Report> Reports { get; set; }
 
     /// <summary>
-    /// Роль пользователя
+    /// Роль пользователя.
     /// </summary>
     public List<Role> Role { get; set; }
 
     /// <summary>
-    /// Дата создания пользователя
+    /// Дата создания пользователя.
     /// </summary>
     public DateTime? CreatedAt { get; set; }
 }

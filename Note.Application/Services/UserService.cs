@@ -155,7 +155,7 @@ public class UserService : IUserService
                     ErrorCode = (int)ErrorCodes.UserNotFound
                 };
             }
-            var dto = user.Select(x => new UserFindDto(x.Login, x.Id)).ToList();
+            var dto = user.Select(x => new UserFindDto(x.Login, x.Id, x?.Photo)).ToList();
 
             return new CollectionResult<UserFindDto>()
             {
@@ -208,7 +208,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<BaseResult<GetInfoUserDto>> GetUserByIdAsync(long id)
+    public async Task<BaseResult<UserFindDto>> GetUserByIdAsync(long id)
     {
         try
         {
@@ -216,21 +216,21 @@ public class UserService : IUserService
 
             if (user is null)
             {
-                return new BaseResult<GetInfoUserDto>()
+                return new BaseResult<UserFindDto>()
                 {
                     ErrorMessage = ErrorMessage.UserNotFound,
                     ErrorCode = (int)ErrorCodes.UserNotFound
                 };
             }
 
-            return new BaseResult<GetInfoUserDto>
+            return new BaseResult<UserFindDto>
             {
-                Data = new GetInfoUserDto(user.Id, user.Login, user?.Photo)
+                Data = new UserFindDto(user.Login, user.Id, user?.Photo)
             };
         }
         catch (Exception ex)
         {
-            return LogErrorHelper<GetInfoUserDto>.LogException(ex.Message, _logger);
+            return LogErrorHelper<UserFindDto>.LogException(ex.Message, _logger);
         }
     }
 }

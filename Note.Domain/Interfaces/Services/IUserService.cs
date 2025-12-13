@@ -38,5 +38,5 @@ public interface IUserService
     /// Поиск пользоваетеля по id.
     /// </summary>
     /// <param name="id">Id пользователя.</param>
-    Task<BaseResult<GetInfoUserDto>> GetUserByIdAsync(long id);
+    Task<BaseResult<UserFindDto>> GetUserByIdAsync(long id);
 }

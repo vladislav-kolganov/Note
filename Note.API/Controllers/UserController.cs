@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Note.Domain.Dto.ChatDto;
 using Note.Domain.Dto.UserDto;
 using Note.Domain.Interfaces.Services;
 using Note.Domain.Result;
@@ -82,7 +83,7 @@ public class UserController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<BaseResult<UserDto>>> FindUserAsync(string login)
+    public async Task<ActionResult<BaseResult<UserFindDto>>> FindUserAsync(string login)
     {
         var response = await _userService.FindUsersAsync(login);
 
@@ -101,7 +102,7 @@ public class UserController : ControllerBase
     [HttpGet("get-by-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<BaseResult<UserDto>>> GetUserByIdAsync(long id)
+    public async Task<ActionResult<BaseResult<UserFindDto>>> GetUserByIdAsync(long id)
     {
         var response = await _userService.GetUserByIdAsync(id);
 
