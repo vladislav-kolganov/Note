@@ -21,6 +21,7 @@ namespace Note.Tests
                  reportRepository: mockReportRepository.Object,
                  userRepository: null,
                  reportValidator: null,
+                 photoReportRepository: null,
                  logger: null,
                  mapper: (AutoMapper.IMapper)mockDistributedCache.Object
                );
@@ -48,6 +49,7 @@ namespace Note.Tests
                 (
                  reportRepository: mockReportRepository.Object,
                  userRepository: mockUserRepository.Object,
+                 photoReportRepository: null,
                  reportValidator: null,
                  logger: null,
                  mapper: (AutoMapper.IMapper)mockDistributedCache.Object
@@ -73,6 +75,7 @@ namespace Note.Tests
                 (
                  reportRepository: mockReportRepository.Object,
                  userRepository: null,
+                 photoReportRepository: null,
                  reportValidator: null,
                  logger: null,
                  mapper: mapper
@@ -99,6 +102,7 @@ namespace Note.Tests
                  reportRepository: mockReportRepository.Object,
                  userRepository: null,
                  reportValidator: null,
+                 photoReportRepository: null,
                  logger: null,
                  mapper: mapper
                );
