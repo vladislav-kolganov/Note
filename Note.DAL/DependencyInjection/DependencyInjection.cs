@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<IBaseRepository<Report>, BaseRepository<Report>>();
         services.AddScoped<IBaseRepository<Chat>, BaseRepository<Chat>>();
         services.AddScoped<IBaseRepository<Message>, BaseRepository<Message>>();
+        services.AddScoped<IBaseRepository<ReportPhoto>, BaseRepository<ReportPhoto>>();
     }
 
     private static IServiceCollection AddSettings(this IServiceCollection services,

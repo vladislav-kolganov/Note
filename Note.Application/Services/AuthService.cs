@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
-using Note.Application.Services.Extensions;
 using Note.Application.Services.Helpers;
 using Note.Domain.Dto;
 using Note.Domain.Dto.UserDto;

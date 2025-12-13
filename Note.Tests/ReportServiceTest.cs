@@ -42,7 +42,7 @@ namespace Note.Tests
             var mapper = MapperConfigurations.GetMapperConfiguration();
 
             var user = MockRepositoriesGetter.GetUsers().FirstOrDefault();
-            var createReportDto = new CreateReportDto("Деловой отчет #1", "Пока не придумали", user.Id);
+            var createReportDto = new CreateReportDto("Деловой отчет #1", "Пока не придумали", user.Id, null);
 
             var reportService = new ReportService
                 (
@@ -91,7 +91,7 @@ namespace Note.Tests
             var mockReportRepository = MockRepositoriesGetter.GetMockReportRepository();
             var mapper = MapperConfigurations.GetMapperConfiguration();
             var report = MockRepositoriesGetter.GetReports().FirstOrDefault();
-            var updateReportDto = new UpdateReportDto(report.Id, "New name for report", "New description for report");
+            var updateReportDto = new UpdateReportDto(report.Id, "New name for report", "New description for report", null);
 
             // Act
             var reportService = new ReportService

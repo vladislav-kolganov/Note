@@ -20,7 +20,7 @@ public class ReportPhoto
     /// <summary>
     /// Описание фотографии.
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// Модель сообщения.

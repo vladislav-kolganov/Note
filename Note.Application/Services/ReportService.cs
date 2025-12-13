@@ -18,6 +18,7 @@ public class ReportService : IReportService
 {
     private readonly IBaseRepository<Report> _reportRepository;
     private readonly IBaseRepository<User> _userRepository;
+    private readonly IBaseRepository<ReportPhoto> _photoReportRepository;
     private readonly IReportValidator _reportValidator;
     private readonly IMapper _mappper;
     private readonly ILogger<ReportService> _logger;
@@ -25,6 +26,7 @@ public class ReportService : IReportService
     public ReportService(
         IBaseRepository<Report> reportRepository,
         IBaseRepository<User> userRepository,
+        IBaseRepository<ReportPhoto> photoReportRepository,
         IReportValidator reportValidator,
         ILogger<ReportService> logger,
         IMapper mapper)
@@ -34,6 +36,7 @@ public class ReportService : IReportService
         _reportValidator = reportValidator;
         _logger = logger;
         _mappper = mapper;
+        _photoReportRepository = photoReportRepository;
     }
 
     public async Task<CollectionResult<ReportDto>> GetResultAsync(long userId)
@@ -119,7 +122,8 @@ public class ReportService : IReportService
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                UserId = dto.UserId
+                UserId = dto.UserId,
+                CreatedAt = DateTime.UtcNow
             };
             if (dto.Photos.IsNotNullOrEmpty())
             {
@@ -209,15 +213,26 @@ public class ReportService : IReportService
 
             report.Name = dto.Name;
             report.Description = dto.Description;
-            report.Photos = dto.Photos
-                .Where(p => !string.IsNullOrWhiteSpace(p.Key))
-                .Select(p => new ReportPhoto
-                {
-                    Content = Convert.FromBase64String(p.Key),
-                    Description = string.IsNullOrWhiteSpace(p.Value) ? String.Empty : p.Value
-                })
-                .ToList();
 
+            if (dto.Photos is null || dto.Photos.Count <= 0)
+            {
+                report.Photos = null;
+                await _photoReportRepository.GetAll()
+                .Where(photo => photo.ReportId == dto.Id)
+                .ExecuteDeleteAsync();
+            }
+            else
+            {
+                report.Photos = report.Photos = dto.Photos.Count >= 1 ? dto.Photos
+                    .Where(p => !string.IsNullOrWhiteSpace(p.Key))
+                    .Select(p => new ReportPhoto
+                    {
+                        Content = Convert.FromBase64String(p.Key),
+                        Description = string.IsNullOrWhiteSpace(p.Value) ? String.Empty : p.Value
+                    })
+                    .ToList() : null;
+            }
+       
             var updatedReport = _reportRepository.Update(report);
             await _reportRepository.SaveChangeAsync();
 
