@@ -18,6 +18,11 @@ public class ReportPhoto
     public long ReportId { get; set; }
 
     /// <summary>
+    /// Описание фотографии.
+    /// </summary>
+    public string Description { get; set; }
+
+    /// <summary>
     /// Модель сообщения.
     /// </summary>
     [JsonIgnore]

@@ -42,7 +42,7 @@ public class ReportService : IReportService
         reports = await _reportRepository.GetAll()
          .Where(x => x.UserId == userId)
          .Include(x => x.Photos)
-         .Select(x => new ReportDto(x.Id, x.Name, x.Description,x.Photos.ToArray(), x.CreatedAt.ToLongDateString()))
+         .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.Photos.ToArray(), x.CreatedAt.ToLongDateString()))
          .ToArrayAsync();
 
         if (!reports.Any())
@@ -61,7 +61,6 @@ public class ReportService : IReportService
             Data = reports,
             Count = reports.Length
         };
-
     }
 
     public async Task<BaseResult<ReportDto>> GetReportAsync(long id)
@@ -122,11 +121,15 @@ public class ReportService : IReportService
                 Description = dto.Description,
                 UserId = dto.UserId
             };
-            if (dto.PhotosBase64.IsNotNullOrEmpty())
+            if (dto.Photos.IsNotNullOrEmpty())
             {
-                report.Photos = dto.PhotosBase64
-                    .Where(p => !string.IsNullOrWhiteSpace(p))
-                    .Select(p => new ReportPhoto { Content = Convert.FromBase64String(p) })
+                report.Photos = dto.Photos
+                    .Where(p => !string.IsNullOrWhiteSpace(p.Key))
+                    .Select(p => new ReportPhoto
+                    {
+                        Content = Convert.FromBase64String(p.Key),
+                        Description = string.IsNullOrWhiteSpace(p.Value) ? String.Empty : p.Value
+                    })
                     .ToList();
             }
 
@@ -206,10 +209,14 @@ public class ReportService : IReportService
 
             report.Name = dto.Name;
             report.Description = dto.Description;
-            report.Photos = dto.PhotosBase64 is null ? null : dto.PhotosBase64
-                    .Where(p => !string.IsNullOrWhiteSpace(p))
-                    .Select(p => new ReportPhoto { Content = Convert.FromBase64String(p) })
-                    .ToList();
+            report.Photos = dto.Photos
+                .Where(p => !string.IsNullOrWhiteSpace(p.Key))
+                .Select(p => new ReportPhoto
+                {
+                    Content = Convert.FromBase64String(p.Key),
+                    Description = string.IsNullOrWhiteSpace(p.Value) ? String.Empty : p.Value
+                })
+                .ToList();
 
             var updatedReport = _reportRepository.Update(report);
             await _reportRepository.SaveChangeAsync();
