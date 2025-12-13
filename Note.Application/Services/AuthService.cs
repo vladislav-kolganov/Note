@@ -257,7 +257,7 @@ public class AuthService : IAuthService
             }
 
             var isVerifyPassword = IsVerifyPassword(user.Password, model.OldPassword);
-            
+
             if (!isVerifyPassword)
             {
                 return new BaseResult<ResetPasswordUserDto>
@@ -269,7 +269,7 @@ public class AuthService : IAuthService
 
             user.Password = HashPassword(model.Password);
 
-             _unitOfWork.Users.Update(user);
+            _unitOfWork.Users.Update(user);
             await _unitOfWork.SaveChangeAsync();
 
             return new BaseResult<ResetPasswordUserDto>

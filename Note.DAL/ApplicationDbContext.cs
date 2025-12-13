@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Note.DAL.Interceptors;
-using Note.Domain.Settings;
 using Note.Domain.Settings.DbSettings;
 
 namespace Note.DAL;
@@ -28,12 +25,6 @@ public class ApplicationDbContext : DbContext
             throw new ArgumentNullException(nameof(PostgresSettings) + " is null");
 
         optionsBuilder.UseNpgsql(config.ConnectionString);
-
-        if (optionsBuilder.IsConfigured)
-        {
-            var httpContextAccessor = new HttpContextAccessor();
-            optionsBuilder.AddInterceptors(new DateInterceptor(httpContextAccessor));
-        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

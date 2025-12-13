@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Note.DAL.Interceptors;
 using Note.DAL.Repositories;
 using Note.Domain.Entity;
 using Note.Domain.Entity.ChatEntity;
@@ -17,8 +16,6 @@ public static class DependencyInjection
         services.AddSettings(configuration);
 
         services.AddDbContext<ApplicationDbContext>();
-
-        services.AddSingleton<DateInterceptor>();
 
         services.InitRepositories();
     }

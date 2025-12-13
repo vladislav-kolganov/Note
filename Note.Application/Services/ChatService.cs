@@ -396,7 +396,7 @@ public class ChatService : IChatService
                 ErrorCode = (int)ErrorChatCodes.MessagesIdsIsEmpty
             };
         }
-      
+
         try
         {
             var rowsAffected = await _messageRepository.GetAll()

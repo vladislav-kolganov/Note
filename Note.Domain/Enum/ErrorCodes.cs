@@ -1,5 +1,8 @@
 ﻿namespace Note.Domain.Enum;
 
+/// <summary>
+/// Перечисление кодов ошибок.
+/// </summary>
 public enum ErrorCodes
 {
     ReportsNotFound = 0,
@@ -16,8 +19,8 @@ public enum ErrorCodes
 
     PasswordNotEqualPasswordConfirm = 21,
     PasswordIsWrong = 22,
-    OldPasswordNotEqualEntryPassword= 23,
-    MinimalLengthLoginIsThreeSymbols= 24,
+    OldPasswordNotEqualEntryPassword = 23,
+    MinimalLengthLoginIsThreeSymbols = 24,
 
     RoleAlreadyExists = 31,
     RoleNotFound = 32

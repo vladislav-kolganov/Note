@@ -232,7 +232,7 @@ public class ReportService : IReportService
                     })
                     .ToList() : null;
             }
-       
+
             var updatedReport = _reportRepository.Update(report);
             await _reportRepository.SaveChangeAsync();
 
