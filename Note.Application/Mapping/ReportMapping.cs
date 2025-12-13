@@ -16,6 +16,7 @@ public class ReportMapping : Profile
             .ForCtorParam(ctorParamName: "Name", m => m.MapFrom(s => s.Name))
             .ForCtorParam(ctorParamName: "Description", m => m.MapFrom(s => s.Description))
             .ForCtorParam(ctorParamName: "DateCreated", m => m.MapFrom(s => s.CreatedAt))
+            .ForCtorParam(ctorParamName: "Photos", m => m.MapFrom(s => s.Photos))
             .ReverseMap();
     }
 }

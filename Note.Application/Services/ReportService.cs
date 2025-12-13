@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Note.Application.Resources;
+using Note.Application.Services.Extensions;
 using Note.Application.Services.Helpers;
 using Note.Domain.Dto.ReportDto;
 using Note.Domain.Entity;
@@ -40,7 +41,8 @@ public class ReportService : IReportService
         ReportDto[] reports;
         reports = await _reportRepository.GetAll()
          .Where(x => x.UserId == userId)
-         .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.CreatedAt.ToLongDateString()))
+         .Include(x => x.Photos)
+         .Select(x => new ReportDto(x.Id, x.Name, x.Description,x.Photos.ToArray(), x.CreatedAt.ToLongDateString()))
          .ToArrayAsync();
 
         if (!reports.Any())
@@ -68,7 +70,7 @@ public class ReportService : IReportService
         {
             var report = await _reportRepository.GetAll()
             .Where(x => x.Id == id)
-            .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.CreatedAt.ToLongDateString()))
+            .Select(x => new ReportDto(x.Id, x.Name, x.Description, x.Photos.ToArray(), x.CreatedAt.ToLongDateString()))
             .FirstOrDefaultAsync();
 
             if (report == null)
@@ -93,10 +95,10 @@ public class ReportService : IReportService
     }
 
     /// <summary>
-    /// Создание отчёта
+    /// Создание отчёта.
     /// </summary>
-    /// <param name="dto">Дто с информацией для создания отчёта</param>
-    /// <returns>Дто созданного отчёта</returns>
+    /// <param name="dto">Дто с информацией для создания отчёта.</param>
+    /// <returns>Дто созданного отчёта.</returns>
     public async Task<BaseResult<ReportDto>> CreateReportAsync(CreateReportDto dto)
     {
         try
@@ -120,6 +122,14 @@ public class ReportService : IReportService
                 Description = dto.Description,
                 UserId = dto.UserId
             };
+            if (dto.PhotosBase64.IsNotNullOrEmpty())
+            {
+                report.Photos = dto.PhotosBase64
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .Select(p => new ReportPhoto { Content = Convert.FromBase64String(p) })
+                    .ToList();
+            }
+
             await _reportRepository.CreateAsync(report);
             await _reportRepository.SaveChangeAsync();
 
@@ -174,7 +184,7 @@ public class ReportService : IReportService
     /// <summary>
     /// Обновление отчёта.
     /// </summary>
-    /// <param name="dto"> Дто с обновлениями</param>
+    /// <param name="dto"> Дто с обновлениями.</param>
     /// <returns>Дто обновленного отчёта.</returns>
     public async Task<BaseResult<ReportDto>> UpdateReportAsync(UpdateReportDto dto)
     {
@@ -196,6 +206,10 @@ public class ReportService : IReportService
 
             report.Name = dto.Name;
             report.Description = dto.Description;
+            report.Photos = dto.PhotosBase64 is null ? null : dto.PhotosBase64
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .Select(p => new ReportPhoto { Content = Convert.FromBase64String(p) })
+                    .ToList();
 
             var updatedReport = _reportRepository.Update(report);
             await _reportRepository.SaveChangeAsync();

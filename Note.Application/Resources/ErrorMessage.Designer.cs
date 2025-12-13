@@ -142,6 +142,15 @@ namespace Note.Application.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Минимальное значение логина не менее 3х символов.
+        /// </summary>
+        internal static string MinimalLengthLoginIsThreeSymbols {
+            get {
+                return ResourceManager.GetString("MinimalLengthLoginIsThreeSymbols", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Старый пароль не совпадает с введенным.
         /// </summary>
         internal static string OldPasswordNotEqualEntryPassword {

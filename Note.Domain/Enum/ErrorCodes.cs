@@ -17,6 +17,7 @@ public enum ErrorCodes
     PasswordNotEqualPasswordConfirm = 21,
     PasswordIsWrong = 22,
     OldPasswordNotEqualEntryPassword= 23,
+    MinimalLengthLoginIsThreeSymbols= 24,
 
     RoleAlreadyExists = 31,
     RoleNotFound = 32

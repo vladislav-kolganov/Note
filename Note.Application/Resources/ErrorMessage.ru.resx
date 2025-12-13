@@ -180,4 +180,7 @@
   <data name="OldPasswordNotEqualEntryPassword" xml:space="preserve">
     <value>Старый пароль не совпадает с введенным</value>
   </data>
+  <data name="MinimalLengthLoginIsThreeSymbols" xml:space="preserve">
+    <value>Минимальное значение логина не менее 3х символов</value>
+  </data>
 </root>

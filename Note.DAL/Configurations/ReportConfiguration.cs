@@ -12,6 +12,11 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
         builder.Property(report => report.Name).IsRequired().HasMaxLength(200);
         builder.Property(report => report.Description).IsRequired().HasMaxLength(2000);
 
+        builder.HasMany(message => message.Photos).
+        WithOne(reportPhoto => reportPhoto.Report).
+        HasForeignKey(reportPhoto => reportPhoto.ReportId).
+        OnDelete(DeleteBehavior.Cascade);
+
         builder.HasData(new List<Report>()
         {
             new Report()

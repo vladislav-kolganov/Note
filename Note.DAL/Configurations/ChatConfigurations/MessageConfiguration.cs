@@ -18,6 +18,5 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
                 WithOne(messagePhoto => messagePhoto.Message).
                 HasForeignKey(messagePhoto => messagePhoto.MessageId).
                 OnDelete(DeleteBehavior.Cascade);
-
     }
 }

@@ -143,6 +143,14 @@ public class AuthService : IAuthService
                 ErrorCode = (int)ErrorCodes.PasswordNotEqualPasswordConfirm
             };
         }
+        if (dto.Login.Length < 2 || string.IsNullOrWhiteSpace(dto.Login))
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.MinimalLengthLoginIsThreeSymbols,
+                ErrorCode = (int)ErrorCodes.MinimalLengthLoginIsThreeSymbols
+            };
+        }
 
         var user = await _userRepository.GetAll().
                          FirstOrDefaultAsync(x => x.Login == dto.Login);

@@ -1,3 +1,10 @@
 ﻿namespace Note.Domain.Dto.ReportDto;
 
-public record UpdateReportDto(long Id, string Name, string Description);
+/// <summary>
+/// Дто для обновления отчёта.
+/// </summary>
+/// <param name="Id">Id отчёта.</param>
+/// <param name="Name">Наименование отчёта.</param>
+/// <param name="Description">Описание отчёта.</param>
+/// <param name="PhotosBase64">Список фото.</param>
+public record UpdateReportDto(long Id, string Name, string Description, List<string>? PhotosBase64);
