@@ -38,11 +38,6 @@ public class User : IEntityId<long>
     public UserToken UserToken { get; set; }
 
     /// <summary>
-    /// Отчёт пользователя.
-    /// </summary>
-    public List<Report> Reports { get; set; }
-
-    /// <summary>
     /// Роль пользователя.
     /// </summary>
     public List<Role> Role { get; set; }

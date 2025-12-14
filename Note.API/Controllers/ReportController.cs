@@ -31,11 +31,12 @@ public class ReportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<BaseResult<ReportDto>>> GetReport(long id)
     {
-        var response = await _reportService.GetReportAsync(id);
+        var response = await _reportService.GetReportById(id);
         if (response.IsSuccess)
         {
             return Ok(response);
         }
+
         return BadRequest(response);
     }
 
@@ -49,11 +50,30 @@ public class ReportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CollectionResult<ReportDto>>> GetUserReports(long userId)
     {
-        var response = await _reportService.GetResultAsync(userId);
+        var response = await _reportService.GetUserReportsAsync(userId);
         if (response.IsSuccess)
         {
             return Ok(response);
         }
+
+        return BadRequest(response);
+    }
+
+    /// <summary>
+    /// Получение отчётов, которыми поделились с пользователем.
+    /// </summary>
+    /// <param name="userId">Id пользователя.</param>
+    [HttpGet("shared-reports/{userId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<CollectionResult<ReportDto>>> GetSharedReports(long userId)
+    {
+        var response = await _reportService.GetSharedReportAsync(userId);
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
         return BadRequest(response);
     }
 
@@ -61,17 +81,19 @@ public class ReportController : ControllerBase
     /// Удаление отчёта по Id.
     /// </summary>
     /// <param name="reportId">Id отчёта.</param>
-    /// <returns>Дто удаленного отчёта.</returns>
-    [HttpDelete("{reportId}")]
+    /// <param name="userId">Id пользователя.</param>
+    /// <returns>True, если получилось удалить отчёт, иначе false.</returns>
+    [HttpDelete("delete-report")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<BaseResult<ReportDto>>> DeleteReport(long reportId)
+    public async Task<ActionResult<BaseResult<bool>>> DeleteReport(long reportId, long userId)
     {
-        var response = await _reportService.DeleteReportAsync(reportId);
+        var response = await _reportService.DeleteReportAsync(reportId, userId);
         if (response.IsSuccess)
         {
             return Ok(response);
         }
+
         return BadRequest(response);
     }
 
@@ -97,6 +119,7 @@ public class ReportController : ControllerBase
         {
             return Ok(response);
         }
+
         return BadRequest(response);
     }
 
@@ -115,6 +138,26 @@ public class ReportController : ControllerBase
         {
             return Ok(response);
         }
+
+        return BadRequest(response);
+    }
+
+    /// <summary>
+    /// Поделиться отчётом.
+    /// </summary>
+    /// <param name="shareReportDto">Дто обновления отчёта.</param>
+    /// <returns>True, если получилось поделиться отчётом, иначе false.</returns>
+    [HttpPost("share-report")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BaseResult<bool>>> ShareReport([FromBody] ShareReportDto shareReportDto)
+    {
+        var response = await _reportService.ShareReport(shareReportDto);
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
         return BadRequest(response);
     }
 }

@@ -6,18 +6,10 @@ using Note.Domain.Result;
 
 namespace Note.Application.Validations;
 
-public class ReportValidator : IReportValidator
+public class CastomValidator : ICastomValidator
 {
-    public BaseResult CreateReportValidator(Report report, User user)
+    public BaseResult UserExistValidator(User user)
     {
-        if (report != null)
-        {
-            return new BaseResult
-            {
-                ErrorMessage = ErrorMessage.ReportAlreadyExists,
-                ErrorCode = (int)ErrorCodes.ReportAlreadyExists
-            };
-        }
         if (user == null)
         {
             return new BaseResult
@@ -31,7 +23,7 @@ public class ReportValidator : IReportValidator
         return new BaseResult();
     }
 
-    public BaseResult ValidateOnNull(Report model)
+    public BaseResult ValidateReportOnNull(Report model)
     {
         if (model == null)
         {
@@ -40,8 +32,8 @@ public class ReportValidator : IReportValidator
                 ErrorMessage = ErrorMessage.ReportNotFound,
                 ErrorCode = (int)ErrorCodes.ReportNotFound
             };
-
         }
+
         return new BaseResult();
     }
 }

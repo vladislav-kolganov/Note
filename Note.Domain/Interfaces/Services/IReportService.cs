@@ -7,17 +7,19 @@ namespace Note.Domain.Interfaces.Services;
 /// Сервис отвечающий за работу с доменной части отчёта (Report).
 /// </summary>
 public interface IReportService
-
 {
-    ///Получение всех отчётов пользователя.
-    Task<CollectionResult<ReportDto>> GetResultAsync(long userId);
+    /// <summary>
+    /// Получение отчётов пользователя, которыми он валедеет.
+    /// </summary>
+    /// <param name="userId">Id пользователя.</param>
+    /// <returns>Список дто отчётов.</returns>
+    Task<CollectionResult<ReportDto>> GetUserReportsAsync(long userId);
 
     /// <summary>
-    /// Получение отчёта по идентификатору.
+    /// Получение расшеренных отчётоы по идентификатору пользователя.
     /// </summary>
-    /// <param name="id">Id отчёта.</param>
-    /// <returns></returns>
-    Task<BaseResult<ReportDto>> GetReportAsync(long id);
+    /// <param name="userId">Id отчёта.</param>
+    Task<CollectionResult<ReportDto>> GetSharedReportAsync(long userId);
 
     /// <summary>
     /// Создание отчёта с базовыми параметрами
@@ -31,7 +33,7 @@ public interface IReportService
     /// </summary>
     /// <param name="id">Id отчёта.</param>
     /// <returns>Дто отчёта.</returns>
-    Task<BaseResult<ReportDto>> DeleteReportAsync(long id);
+    Task<BaseResult<bool>> DeleteReportAsync(long reportId, long userId);
 
     /// <summary>
     /// Обновление отчёта по идентификатору.
@@ -39,4 +41,18 @@ public interface IReportService
     /// <param name="dto">Дто обновления отчёта.</param>
     /// <returns>Дто отчёта.</returns>
     Task<BaseResult<ReportDto>> UpdateReportAsync(UpdateReportDto dto);
+
+    /// <summary>
+    /// Шеринг отчёта.
+    /// </summary>
+    /// <param name="dto">Дто шеринга отчёта.</param>
+    /// <returns>True, если получилось расшерить отчёт, иначе ошибки.</returns>
+    Task<BaseResult<bool>> ShareReport(ShareReportDto dto);
+
+    /// <summary>
+    /// Получить отчёт по Id отчёта.
+    /// </summary>
+    /// <param name="reportId">Id отчёта.</param>
+    /// <returns>Дто отчёта.</returns>
+    Task<BaseResult<ReportDto>> GetReportById(long reportId);
 }

@@ -183,4 +183,16 @@
   <data name="MinimalLengthLoginIsThreeSymbols" xml:space="preserve">
     <value>Minimal length login is three symbols</value>
   </data>
+  <data name="ReportAlreadyShared" xml:space="preserve">
+    <value>Report already shared</value>
+  </data>
+  <data name="YouCantShareTheReportWithYourself" xml:space="preserve">
+    <value>You can't share the report with yourself.</value>
+  </data>
+  <data name="YouDontHaveTheRightsToShareThisReport" xml:space="preserve">
+    <value>You don't have the rights to search this report.</value>
+  </data>
+  <data name="YouDontHaveTheRrightsToEditThisReport" xml:space="preserve">
+    <value>You don't have the rights to edit this report</value>
+  </data>
 </root>

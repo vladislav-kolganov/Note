@@ -187,6 +187,15 @@ namespace Note.Application.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Вы уже поделились этим отчётом с данным пользователем. Чтобы поделиться им снова, необходимо чтобы пользователь,которому отправляется отчёт его у себя удалил.
+        /// </summary>
+        internal static string ReportAlreadyShared {
+            get {
+                return ResourceManager.GetString("ReportAlreadyShared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Отчёт не найден.
         /// </summary>
         internal static string ReportNotFound {
@@ -255,6 +264,33 @@ namespace Note.Application.Resources {
         internal static string UserNotFound {
             get {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Нельзя поделиться с собой же отчётом.
+        /// </summary>
+        internal static string YouCantShareTheReportWithYourself {
+            get {
+                return ResourceManager.GetString("YouCantShareTheReportWithYourself", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на У вас нет прав делиться этим отчётом.
+        /// </summary>
+        internal static string YouDontHaveTheRightsToShareThisReport {
+            get {
+                return ResourceManager.GetString("YouDontHaveTheRightsToShareThisReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на У вас нет прав редактировать этот отчёт.
+        /// </summary>
+        internal static string YouDontHaveTheRrightsToEditThisReport {
+            get {
+                return ResourceManager.GetString("YouDontHaveTheRrightsToEditThisReport", resourceCulture);
             }
         }
     }

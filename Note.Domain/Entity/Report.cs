@@ -28,16 +28,6 @@ public class Report : IEntityId<long>
     public List<ReportPhoto> Photos { get; set; } = new();
 
     /// <summary>
-    /// Связанный пользователь с этим отчётом.
-    /// </summary>
-    public User User { get; set; }
-
-    /// <summary>
-    /// Id пользователя создавшего отчёт.
-    /// </summary>
-    public long UserId { get; set; }
-
-    /// <summary>
     /// Время создания отчёта.
     /// </summary>
     public DateTime CreatedAt { get; set; }

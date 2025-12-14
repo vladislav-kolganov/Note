@@ -183,4 +183,16 @@
   <data name="MinimalLengthLoginIsThreeSymbols" xml:space="preserve">
     <value>Минимальное значение логина не менее 3х символов</value>
   </data>
+  <data name="ReportAlreadyShared" xml:space="preserve">
+    <value>Вы уже поделились этим отчётом с данным пользователем. Чтобы поделиться им снова, необходимо чтобы пользователь,которому отправляется отчёт его у себя удалил</value>
+  </data>
+  <data name="YouCantShareTheReportWithYourself" xml:space="preserve">
+    <value>Нельзя поделиться с собой же отчётом</value>
+  </data>
+  <data name="YouDontHaveTheRightsToShareThisReport" xml:space="preserve">
+    <value>У вас нет прав делиться этим отчётом</value>
+  </data>
+  <data name="YouDontHaveTheRrightsToEditThisReport" xml:space="preserve">
+    <value>У вас нет прав редактировать этот отчёт</value>
+  </data>
 </root>

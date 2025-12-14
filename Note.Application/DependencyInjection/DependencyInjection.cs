@@ -50,7 +50,7 @@ public static class DependencyInjection
 
     public static void InitEntityValidators(this IServiceCollection services)
     {
-        services.AddScoped<IReportValidator, ReportValidator>();
+        services.AddScoped<ICastomValidator, CastomValidator>();
     }
 
 }

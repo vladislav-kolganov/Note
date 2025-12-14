@@ -8,6 +8,10 @@ public enum ErrorCodes
     ReportsNotFound = 0,
     ReportNotFound = 1,
     ReportAlreadyExists = 2,
+    ReportAlreadyShared = 3,
+    YouCantShareTheReportWithYourself = 4,
+    YouDontHaveTheRightsToShareThisReport = 5,
+    YouDontHaveTheRrightsToEditThisReport = 6,
 
     InvalidClientRequest = 9,
     InternalServerError = 10,

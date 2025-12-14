@@ -16,25 +16,5 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
         WithOne(reportPhoto => reportPhoto.Report).
         HasForeignKey(reportPhoto => reportPhoto.ReportId).
         OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasData(new List<Report>()
-        {
-            new Report()
-            {
-                Id = 1,
-                Name = "testname1",
-                Description = "tesrjigbejrfhibugehjrfiu",
-                UserId = 1,
-                CreatedAt = DateTime.UtcNow
-            },
-            new Report()
-            {
-                Id = 2,
-                Name = "testname2",
-                Description = "fvddfgvdfvfvddfvvfd",
-                UserId = 2,
-                CreatedAt = DateTime.UtcNow
-            }
-        });
     }
 }

@@ -3,7 +3,7 @@
 public static class IEnumerableExtensions
 {
     /// <summary>
-    /// Проверяет последовательность на null и пустоту
+    /// Проверяет последовательность на null и пустоту.
     /// </summary>
     /// <typeparam name="T">Тип последовательности.</typeparam>
     /// <param name="source">Последовательность.</param>
@@ -14,7 +14,7 @@ public static class IEnumerableExtensions
     }
 
     /// <summary>
-    /// Проверяет последовательность на null и пустоту
+    /// Проверяет последовательность на null и пустоту.
     /// </summary>
     /// <typeparam name="T">Тип последовательности.</typeparam>
     /// <param name="source">Последовательность.</param>

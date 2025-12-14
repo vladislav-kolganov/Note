@@ -13,11 +13,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.Password).IsRequired();
         builder.Property(user => user.Photo).HasColumnType("bytea");
 
-        builder.HasMany(user => user.Reports).WithOne(report => report.User)
-        .HasForeignKey(report => report.UserId)
-        .HasPrincipalKey(user => user.Id);
-
-        builder.HasMany<Role>(user => user.Role).WithMany(role => role.Users)
+        builder.HasMany(user => user.Role).WithMany(role => role.Users)
             .UsingEntity<UserRole>
             (
                 r => r.HasOne<Role>().WithMany().HasForeignKey(x => x.RoleId),
