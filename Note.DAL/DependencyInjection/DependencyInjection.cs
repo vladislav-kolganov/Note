@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Note.DAL.Repositories;
 using Note.Domain.Entity;
 using Note.Domain.Entity.ChatEntity;
+using Note.Domain.Entity.Map;
 using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.Repositories;
 using Note.Domain.Settings;
@@ -32,6 +33,8 @@ public static class DependencyInjection
         services.AddScoped<IBaseRepository<Message>, BaseRepository<Message>>();
         services.AddScoped<IBaseRepository<ReportPhoto>, BaseRepository<ReportPhoto>>();
         services.AddScoped<IBaseRepository<UserReport>, BaseRepository<UserReport>>();
+        services.AddScoped<IBaseRepository<ReportMapMarker>, BaseRepository<ReportMapMarker>>();
+        services.AddScoped<IBaseRepository<ReportMapMarkerAttachment>, BaseRepository<ReportMapMarkerAttachment>>();
     }
 
     private static IServiceCollection AddSettings(this IServiceCollection services,

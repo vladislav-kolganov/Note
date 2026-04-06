@@ -1,4 +1,5 @@
-﻿using Note.Domain.Interfaces;
+﻿using Note.Domain.Entity.Map;
+using Note.Domain.Interfaces;
 
 namespace Note.Domain.Entity;
 
@@ -26,6 +27,11 @@ public class Report : IEntityId<long>
     /// Поддержка фотографий в отчёте.
     /// </summary>
     public List<ReportPhoto> Photos { get; set; } = new();
+
+    /// <summary>
+    /// Маркеры на карте.
+    /// </summary>
+    public List<ReportMapMarker> MapMarkers { get; set; } = new();
 
     /// <summary>
     /// Время создания отчёта.

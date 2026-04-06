@@ -6,6 +6,7 @@ using Note.Application.Services.Extensions;
 using Note.Application.Services.Helpers;
 using Note.Domain.Dto.ReportDto;
 using Note.Domain.Entity;
+using Note.Domain.Entity.Map;
 using Note.Domain.Enum;
 using Note.Domain.Interfaces.Database;
 using Note.Domain.Interfaces.Repositories;
@@ -21,6 +22,8 @@ public class ReportService : IReportService
     private readonly IBaseRepository<User> _userRepository;
     private readonly IBaseRepository<ReportPhoto> _photoReportRepository;
     private readonly IBaseRepository<UserReport> _userReportRepository;
+    private readonly IBaseRepository<ReportMapMarker> _reportMapMarkerRepository;
+    private readonly IBaseRepository<ReportMapMarkerAttachment> _reportMapMarkerAttachmentRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICastomValidator _customValidator;
     private readonly IMapper _mappper;
@@ -31,6 +34,8 @@ public class ReportService : IReportService
         IBaseRepository<User> userRepository,
         IBaseRepository<ReportPhoto> photoReportRepository,
         IBaseRepository<UserReport> userReportRepository,
+        IBaseRepository<ReportMapMarker> reportMapMarkerRepository,
+        IBaseRepository<ReportMapMarkerAttachment> reportMapMarkerAttachmentRepository,
         ICastomValidator customValidator,
         ILogger<ReportService> logger,
         IUnitOfWork unitOfWork,
@@ -40,6 +45,8 @@ public class ReportService : IReportService
         _userRepository = userRepository;
         _photoReportRepository = photoReportRepository;
         _userReportRepository = userReportRepository;
+        _reportMapMarkerRepository = reportMapMarkerRepository;
+        _reportMapMarkerAttachmentRepository = reportMapMarkerAttachmentRepository;
         _unitOfWork = unitOfWork;
         _customValidator = customValidator;
         _logger = logger;
@@ -52,9 +59,8 @@ public class ReportService : IReportService
         {
             var userReportIds = await _userReportRepository
                 .GetAll()
-                .Where(l => l.OwnerId == userId && l.UserId == userId
-                    && !l.IsDeleteForThisUser).
-                    Select(l => l.ReportId)
+                .Where(l => l.OwnerId == userId && l.UserId == userId && !l.IsDeleteForThisUser)
+                .Select(l => l.ReportId)
                 .Distinct()
                 .ToListAsync();
 
@@ -71,11 +77,8 @@ public class ReportService : IReportService
                 .GetAll()
                 .Where(x => userReportIds.Contains(x.Id))
                 .Include(x => x.Photos)
-                .Select(x => new ReportDto(
-                    x.Id, x.Name,
-                    x.Description,
-                    x.Photos.ToArray(),
-                    x.CreatedAt.ToLongDateString()))
+                .Include(x => x.MapMarkers)
+                    .ThenInclude(m => m.Attachments)
                 .ToArrayAsync();
 
             if (reports.IsNullOrEmpty())
@@ -91,7 +94,7 @@ public class ReportService : IReportService
 
             return new CollectionResult<ReportDto>
             {
-                Data = reports,
+                Data = _mappper.Map<ReportDto[]>(reports),
                 Count = reports.Length
             };
         }
@@ -106,12 +109,11 @@ public class ReportService : IReportService
         try
         {
             var userReportIds = await _userReportRepository
-                           .GetAll()
-                           .Where(l => l.OwnerId != userId && l.UserId == userId
-                               && !l.IsDeleteForThisUser).
-                               Select(l => l.ReportId)
-                           .Distinct()
-                           .ToListAsync();
+                .GetAll()
+                .Where(l => l.OwnerId != userId && l.UserId == userId && !l.IsDeleteForThisUser)
+                .Select(l => l.ReportId)
+                .Distinct()
+                .ToListAsync();
 
             if (userReportIds.IsNullOrEmpty())
             {
@@ -126,11 +128,8 @@ public class ReportService : IReportService
                 .GetAll()
                 .Where(x => userReportIds.Contains(x.Id))
                 .Include(x => x.Photos)
-                .Select(x => new ReportDto(
-                    x.Id, x.Name,
-                    x.Description,
-                    x.Photos.ToArray(),
-                    x.CreatedAt.ToLongDateString()))
+                .Include(x => x.MapMarkers)
+                    .ThenInclude(m => m.Attachments)
                 .ToArrayAsync();
 
             if (reports.IsNullOrEmpty())
@@ -143,10 +142,10 @@ public class ReportService : IReportService
                     ErrorCode = (int)ErrorCodes.ReportsNotFound
                 };
             }
-      
+
             return new CollectionResult<ReportDto>
             {
-                Data = reports,
+                Data = _mappper.Map<ReportDto[]>(reports),
                 Count = reports.Length
             };
         }
@@ -158,7 +157,6 @@ public class ReportService : IReportService
 
     public async Task<BaseResult<bool>> ShareReport(ShareReportDto dto)
     {
-        // проверяем не шерит ли юзер сам себе отчёт 
         if (dto.TargetUserId == dto.OwnerUserId)
         {
             return new BaseResult<bool>()
@@ -168,11 +166,12 @@ public class ReportService : IReportService
             };
         }
 
-        var links = await _userReportRepository //все записи с отчётом который хотим расшерить
+        var links = await _userReportRepository
             .GetAll()
             .Where(x => x.ReportId == dto.ReportId)
             .ToArrayAsync();
-        if (links.IsNullOrEmpty()) // проверяем что записи с таким отчётом вообще существуют, если нет - выходим, иначе нечего шерить.
+
+        if (links.IsNullOrEmpty())
         {
             return new BaseResult<bool>()
             {
@@ -182,10 +181,9 @@ public class ReportService : IReportService
         }
 
         var haveRightsForSharing = links.FirstOrDefault(
-            x => x.OwnerId == dto.OwnerUserId
-              && x.UserId == dto.OwnerUserId);
+            x => x.OwnerId == dto.OwnerUserId && x.UserId == dto.OwnerUserId);
 
-        if ( haveRightsForSharing is null)
+        if (haveRightsForSharing is null)
         {
             return new BaseResult<bool>()
             {
@@ -194,8 +192,9 @@ public class ReportService : IReportService
             };
         }
 
-        var sharedLink = links.FirstOrDefault(x => x.UserId == dto.TargetUserId); // проверяем был ли ранее этот отчёт расшерен пользователю, должна быть одна запись
-        if (sharedLink is null) // если отчёт не был расшерин ранее, то шерим отчёт
+        var sharedLink = links.FirstOrDefault(x => x.UserId == dto.TargetUserId);
+
+        if (sharedLink is null)
         {
             var newLink = new UserReport()
             {
@@ -213,7 +212,8 @@ public class ReportService : IReportService
                 Data = true
             };
         }
-        if (!sharedLink.IsDeleteForThisUser) // проверяем кейс, что отчёт был ранее расшерин и пользователь у себя его не удалил
+
+        if (!sharedLink.IsDeleteForThisUser)
         {
             return new BaseResult<bool>()
             {
@@ -221,46 +221,51 @@ public class ReportService : IReportService
                 ErrorCode = (int)ErrorCodes.ReportAlreadyShared
             };
         }
-        else // кейс, что отчёт был ранее расшерин и пользователь у себя его удалил
+
+        sharedLink.IsDeleteForThisUser = false;
+        _userReportRepository.Update(sharedLink);
+        await _userReportRepository.SaveChangeAsync();
+
+        return new BaseResult<bool>()
         {
-            sharedLink.IsDeleteForThisUser = false;
-
-            _userReportRepository.Update(sharedLink);
-            await _userReportRepository.SaveChangeAsync();
-
-            return new BaseResult<bool>()
-            {
-                Data = true
-            };
-        }
+            Data = true
+        };
     }
 
     public async Task<BaseResult<ReportDto>> GetReportById(long reportId)
     {
-        var report = await _reportRepository.GetAll()
-            .Include(r => r.Photos)
-            .FirstOrDefaultAsync(r => r.Id == reportId);
-        var result = _customValidator.ValidateReportOnNull(report);
-        if (!result.IsSuccess)
+        try
         {
+            var report = await _reportRepository.GetAll()
+                .Include(r => r.Photos)
+                .Include(r => r.MapMarkers)
+                    .ThenInclude(m => m.Attachments)
+                .FirstOrDefaultAsync(r => r.Id == reportId);
+
+            var result = _customValidator.ValidateReportOnNull(report);
+            if (!result.IsSuccess)
+            {
+                return new BaseResult<ReportDto>()
+                {
+                    ErrorMessage = result.ErrorMessage,
+                    ErrorCode = result.ErrorCode
+                };
+            }
+
             return new BaseResult<ReportDto>()
             {
-                ErrorMessage = result.ErrorMessage,
-                ErrorCode = result.ErrorCode
+                Data = _mappper.Map<ReportDto>(report)
             };
         }
-
-        return new BaseResult<ReportDto>()
+        catch (Exception ex)
         {
-            Data = _mappper.Map<ReportDto>(report)
-        };
+            return LogErrorHelper<ReportDto>.LogException(ex.Message, _logger);
+        }
     }
 
     public async Task<BaseResult<ReportDto>> CreateReportAsync(CreateReportDto dto)
     {
-
         var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == dto.UserId);
-        var report = await _reportRepository.GetAll().FirstOrDefaultAsync(x => x.Name == dto.Name);
         var result = _customValidator.UserExistValidator(user);
 
         if (!result.IsSuccess)
@@ -271,27 +276,19 @@ public class ReportService : IReportService
                 ErrorCode = result.ErrorCode
             };
         }
+
         using (var transaction = await _unitOfWork.BeginTransactionAsync())
         {
             try
             {
-                report = new Report()
+                var report = new Report()
                 {
-                    Name = dto.Name,
+                    Name = dto.Name.Trim(),
                     Description = dto.Description,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    Photos = MapFilesHelper.BuildReportPhotos(dto.Photos) ?? new List<ReportPhoto>(),
+                    MapMarkers = MapFilesHelper.BuildMapMarkers(dto.MapMarkers) ?? new List<ReportMapMarker>()
                 };
-                if (dto.Photos.IsNotNullOrEmpty())
-                {
-                    report.Photos = dto.Photos
-                        .Where(p => !string.IsNullOrWhiteSpace(p.Key))
-                        .Select(p => new ReportPhoto
-                        {
-                            Content = Convert.FromBase64String(p.Key),
-                            Description = string.IsNullOrWhiteSpace(p.Value) ? String.Empty : p.Value
-                        })
-                        .ToList();
-                }
 
                 report = await _reportRepository.CreateAsync(report);
                 await _unitOfWork.SaveChangeAsync();
@@ -305,13 +302,19 @@ public class ReportService : IReportService
                 };
 
                 await _userReportRepository.CreateAsync(userReport);
-
                 await _unitOfWork.SaveChangeAsync();
+
                 await transaction.CommitAsync();
+
+                var createdReport = await _reportRepository.GetAll()
+                    .Include(r => r.Photos)
+                    .Include(r => r.MapMarkers)
+                        .ThenInclude(m => m.Attachments)
+                    .FirstOrDefaultAsync(r => r.Id == report.Id);
 
                 return new BaseResult<ReportDto>()
                 {
-                    Data = _mappper.Map<ReportDto>(report)
+                    Data = _mappper.Map<ReportDto>(createdReport)
                 };
             }
             catch (Exception ex)
@@ -327,8 +330,8 @@ public class ReportService : IReportService
         try
         {
             var userReportLink = await _userReportRepository
-               .GetAll()
-               .FirstOrDefaultAsync(x => x.ReportId == reportId && x.UserId == userId);
+                .GetAll()
+                .FirstOrDefaultAsync(x => x.ReportId == reportId && x.UserId == userId);
 
             if (userReportLink is null)
             {
@@ -358,9 +361,12 @@ public class ReportService : IReportService
     {
         try
         {
-            var report = await _reportRepository.GetAll().
-                Include(r => r.Photos).
-                FirstOrDefaultAsync(x => x.Id == dto.reportId);
+            var report = await _reportRepository.GetAll()
+                .Include(r => r.Photos)
+                .Include(r => r.MapMarkers)
+                    .ThenInclude(m => m.Attachments)
+                .FirstOrDefaultAsync(x => x.Id == dto.reportId);
+
             var result = _customValidator.ValidateReportOnNull(report);
             if (!result.IsSuccess)
             {
@@ -377,9 +383,9 @@ public class ReportService : IReportService
                 .ToListAsync();
 
             var canUpdate = links.FirstOrDefault(x => x.OwnerId == dto.userId && x.UserId == dto.userId);
-            if (canUpdate is null) 
+            if (canUpdate is null)
             {
-                return new BaseResult<ReportDto>() 
+                return new BaseResult<ReportDto>()
                 {
                     ErrorMessage = ErrorMessage.YouDontHaveTheRrightsToEditThisReport,
                     ErrorCode = (int)ErrorCodes.YouDontHaveTheRrightsToEditThisReport
@@ -387,45 +393,54 @@ public class ReportService : IReportService
             }
 
             var sharedWithOthers = links.Any(ur => ur.UserId != dto.userId);
-            if (!sharedWithOthers) // если отчёт не расшерин то можно обновить оригинал
+
+            if (!sharedWithOthers)
             {
-                report.Name = dto.Name;
-                report.Description = dto.Description;
+                using (var transaction = await _unitOfWork.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        report.Name = dto.Name.Trim();
+                        report.Description = dto.Description;
+                        report.UpdatedAt = DateTime.UtcNow;
 
-                if (dto.Photos is null || dto.Photos.Count <= 0)
-                {
-                    report.Photos = null;
-                    await _photoReportRepository.GetAll()
-                    .Where(photo => photo.ReportId == dto.reportId)
-                    .ExecuteDeleteAsync();
-                }
-                else
-                {
-                    report.Photos = report.Photos = dto.Photos.Count >= 1 ? dto.Photos
-                        .Where(p => !string.IsNullOrWhiteSpace(p.Key))
-                        .Select(p => new ReportPhoto
+                        // 1. Обновляем обычные фото отчёта
+                        await ReplaceReportPhotosAsync(dto.reportId, report, dto.Photos);
+
+                        // 2. Обновляем карту (полная замена маркеров)
+                        await ReplaceMapMarkersAsync(dto.reportId, dto.MapMarkers);
+
+                        _reportRepository.Update(report);
+                        await _unitOfWork.SaveChangeAsync();
+
+                        await transaction.CommitAsync();
+
+                        var updatedReport = await _reportRepository.GetAll()
+                            .Include(r => r.Photos)
+                            .Include(r => r.MapMarkers)
+                                .ThenInclude(m => m.Attachments)
+                            .FirstOrDefaultAsync(r => r.Id == dto.reportId);
+
+                        return new BaseResult<ReportDto>()
                         {
-                            Content = Convert.FromBase64String(p.Key),
-                            Description = string.IsNullOrWhiteSpace(p.Value) ? String.Empty : p.Value
-                        })
-                        .ToList() : null;
+                            Data = _mappper.Map<ReportDto>(updatedReport)
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        return LogErrorHelper<ReportDto>.LogException(ex.Message, _logger);
+                    }
                 }
-
-                var updatedReport = _reportRepository.Update(report);
-                await _reportRepository.SaveChangeAsync();
-
-                return new BaseResult<ReportDto>()
-                {
-                    Data = _mappper.Map<ReportDto>(updatedReport)
-                };
             }
-            else // если уже отчет расшерин, то создаем копию, чтобы у других осталась старая версия.
+            else
             {
                 var newReport = await CreateReportAsync(new CreateReportDto(
                     dto.Name,
                     dto.Description,
                     dto.userId,
-                    dto.Photos));
+                    dto.Photos,
+                    dto.MapMarkers));
 
                 if (!newReport.IsSuccess)
                 {
@@ -438,7 +453,7 @@ public class ReportService : IReportService
 
                 var ownerLink = links.FirstOrDefault(x => x.OwnerId == dto.userId && x.UserId == dto.userId);
 
-                ownerLink.IsDeleteForThisUser = true;
+                ownerLink!.IsDeleteForThisUser = true;
                 _userReportRepository.Update(ownerLink);
                 await _userReportRepository.SaveChangeAsync();
 
@@ -453,4 +468,33 @@ public class ReportService : IReportService
             return LogErrorHelper<ReportDto>.LogException(ex.Message, _logger);
         }
     }
+
+    #region Private Helpers
+
+    private async Task ReplaceReportPhotosAsync(long reportId, Report report, Dictionary<string, string>? photos)
+    {
+        await _photoReportRepository.GetAll()
+            .Where(photo => photo.ReportId == reportId)
+            .ExecuteDeleteAsync();
+
+        report.Photos = MapFilesHelper.BuildReportPhotos(photos) ?? new List<ReportPhoto>();
+    }
+
+    private async Task ReplaceMapMarkersAsync(long reportId, List<CreateReportMapMarkerDto>? mapMarkers)
+    {
+        await _reportMapMarkerRepository.GetAll()
+            .Where(marker => marker.ReportId == reportId)
+            .ExecuteDeleteAsync();
+
+        var newMarkers = MapFilesHelper.BuildMapMarkers(mapMarkers);
+        if (newMarkers.IsNullOrEmpty())
+            return;
+
+        foreach (var marker in newMarkers)
+        {
+            marker.ReportId = reportId;
+            await _reportMapMarkerRepository.CreateAsync(marker);
+        }
+    }
+    #endregion
 }

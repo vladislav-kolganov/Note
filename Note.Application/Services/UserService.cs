@@ -62,9 +62,9 @@ public class UserService : IUserService
 
             return await _authService.Register(new RegisterUserDto
                 (
-                    Login: model.Login,
-                    Password: model.Password,
-                    PasswordConfirm: model.PasswordConfirm,
+                    Login: model.Login.Trim(),
+                    Password: model.Password.Trim(),
+                    PasswordConfirm: model.PasswordConfirm.Trim(),
                     Photo: model.Photo)
                 );
         }
@@ -145,8 +145,11 @@ public class UserService : IUserService
                 };
             }
 
-            var user = await _userRepository.GetAll().Where(user => user.Login.Contains(login)).
-                                             ToArrayAsync();
+            var user = await _userRepository
+                .GetAll()
+                .Where(user => user.Login.Contains(login.Trim()))
+                .ToArrayAsync();
+
             if (user.IsNullOrEmpty())
             {
                 return new CollectionResult<UserFindDto>()

@@ -16,5 +16,11 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
         WithOne(reportPhoto => reportPhoto.Report).
         HasForeignKey(reportPhoto => reportPhoto.ReportId).
         OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(x => x.MapMarkers)
+            .WithOne(x => x.Report)
+            .HasForeignKey(x => x.ReportId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
