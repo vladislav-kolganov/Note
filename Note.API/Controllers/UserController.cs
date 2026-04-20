@@ -83,7 +83,7 @@ public class UserController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<BaseResult<UserFindDto>>> FindUserAsync(string login)
+    public async Task<ActionResult<CollectionResult<UserFindDto>>> FindUserAsync(string login)
     {
         var response = await _userService.FindUsersAsync(login);
 

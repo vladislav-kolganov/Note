@@ -132,7 +132,8 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<CollectionResult<UserFindDto>> FindUsersAsync(string login)
+    public async Task<CollectionResult<UserFindDto>> FindUsersAsync(
+        string login)
     {
         try
         {
@@ -145,29 +146,50 @@ public class UserService : IUserService
                 };
             }
 
-            var user = await _userRepository
-                .GetAll()
-                .Where(user => user.Login.Contains(login.Trim()))
-                .ToArrayAsync();
+            var trimmedLogin = login.Trim();
+            var normalizedSearch = LoginSearchHelper.Normalize(trimmedLogin);
 
-            if (user.IsNullOrEmpty())
+            if (normalizedSearch.Length < 2)
             {
                 return new CollectionResult<UserFindDto>()
                 {
-                    ErrorMessage = ErrorMessage.UserNotFound,
-                    ErrorCode = (int)ErrorCodes.UserNotFound
+                    ErrorMessage = "Введите минимум 2 символа для поиска.",
+                    ErrorCode = (int)ErrorChatCodes.UserLoginIsEmpty
                 };
             }
-            var dto = user.Select(x => new UserFindDto(x.Login, x.Id, x?.Photo)).ToList();
+
+            var searchPattern = $"%{trimmedLogin}%";
+
+            var candidates = await _userRepository
+                .GetAll()
+                .Where(x => EF.Functions.Like(x.Login, searchPattern))
+                .Take(100)
+                .ToArrayAsync();
+
+            var result = candidates
+                .Select(x => new
+                {
+                    User = x,
+                    Score = LoginSearchHelper.CalculateScore(x.Login, trimmedLogin)
+                })
+                .Where(x => x.Score > 0)
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.User.Login.Length)
+                .ThenBy(x => x.User.Login)
+                .Take(20)
+                .Select(x => new UserFindDto(x.User.Login, x.User.Id, x.User.Photo))
+                .ToList();
 
             return new CollectionResult<UserFindDto>()
             {
-                Data = dto,
-                Count = dto.Count,
+                Data = result,
+                Count = result.Count
             };
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Ошибка при поиске пользователей по логину {Login}", login);
+
             return LogErrorHelper<UserFindDto>.LogExceptionForCollection(ex.Message, _logger);
         }
     }
