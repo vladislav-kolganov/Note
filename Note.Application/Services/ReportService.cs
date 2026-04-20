@@ -361,10 +361,8 @@ public class ReportService : IReportService
     {
         try
         {
-            var report = await _reportRepository.GetAll()
-                .Include(r => r.Photos)
-                .Include(r => r.MapMarkers)
-                    .ThenInclude(m => m.Attachments)
+            var report = await _reportRepository
+                .GetAll()
                 .FirstOrDefaultAsync(x => x.Id == dto.reportId);
 
             var result = _customValidator.ValidateReportOnNull(report);
@@ -405,21 +403,21 @@ public class ReportService : IReportService
                         report.UpdatedAt = DateTime.UtcNow;
 
                         // 1. Обновляем обычные фото отчёта
-                        await ReplaceReportPhotosAsync(dto.reportId, report, dto.Photos);
+                        await ReplaceReportPhotosAsync(dto.reportId, dto.Photos);
 
                         // 2. Обновляем карту (полная замена маркеров)
                         await ReplaceMapMarkersAsync(dto.reportId, dto.MapMarkers);
 
-                        _reportRepository.Update(report);
                         await _unitOfWork.SaveChangeAsync();
 
-                        await transaction.CommitAsync();
-
                         var updatedReport = await _reportRepository.GetAll()
+                            .AsNoTracking()
                             .Include(r => r.Photos)
                             .Include(r => r.MapMarkers)
                                 .ThenInclude(m => m.Attachments)
                             .FirstOrDefaultAsync(r => r.Id == dto.reportId);
+
+                        await transaction.CommitAsync();
 
                         return new BaseResult<ReportDto>()
                         {
@@ -471,13 +469,24 @@ public class ReportService : IReportService
 
     #region Private Helpers
 
-    private async Task ReplaceReportPhotosAsync(long reportId, Report report, Dictionary<string, string>? photos)
+    private async Task ReplaceReportPhotosAsync(long reportId, Dictionary<string, string>? photos)
     {
         await _photoReportRepository.GetAll()
             .Where(photo => photo.ReportId == reportId)
             .ExecuteDeleteAsync();
 
-        report.Photos = MapFilesHelper.BuildReportPhotos(photos) ?? new List<ReportPhoto>();
+        var newPhotos = MapFilesHelper.BuildReportPhotos(photos);
+
+        if (newPhotos.IsNullOrEmpty())
+        { 
+            return; 
+        }
+
+        foreach (var photo in newPhotos)
+        {
+            photo.ReportId = reportId;
+            await _photoReportRepository.CreateAsync(photo);
+        }
     }
 
     private async Task ReplaceMapMarkersAsync(long reportId, List<CreateReportMapMarkerDto>? mapMarkers)
@@ -488,7 +497,9 @@ public class ReportService : IReportService
 
         var newMarkers = MapFilesHelper.BuildMapMarkers(mapMarkers);
         if (newMarkers.IsNullOrEmpty())
+        {
             return;
+        }
 
         foreach (var marker in newMarkers)
         {
