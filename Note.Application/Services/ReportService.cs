@@ -477,7 +477,7 @@ public class ReportService : IReportService
 
         var newPhotos = MapFilesHelper.BuildReportPhotos(photos);
 
-        if (newPhotos.IsNullOrEmpty())
+        if (newPhotos?.IsNullOrEmpty() ?? true)
         { 
             return; 
         }
@@ -496,7 +496,8 @@ public class ReportService : IReportService
             .ExecuteDeleteAsync();
 
         var newMarkers = MapFilesHelper.BuildMapMarkers(mapMarkers);
-        if (newMarkers.IsNullOrEmpty())
+        
+        if (newMarkers?.IsNullOrEmpty() ?? true)
         {
             return;
         }

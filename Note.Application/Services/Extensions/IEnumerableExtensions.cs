@@ -21,6 +21,6 @@ public static class IEnumerableExtensions
     /// <returns>Если последовательность не содержит элементы, вернет true, иначе false.</returns>
     public static bool IsNullOrEmpty<T>(this IEnumerable<T> source)
     {
-        return source == null && !source.Any();
+        return source == null || !source.Any();
     }
 }
