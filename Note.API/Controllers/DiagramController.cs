@@ -6,6 +6,7 @@ using Note.Domain.Result;
 namespace Note.API.Controllers;
 
 [ApiController]
+[Route("[controller]")]
 public class DiagramController : Controller
 {
     private readonly IDiagramService _diagramService;
@@ -20,7 +21,7 @@ public class DiagramController : Controller
     /// По количеству меток пожара.
     /// </summary>
     /// <param name="reportIds">Id отчётов.</param>
-    [HttpGet]
+    [HttpPost("get_fire_class_chart")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CollectionResult<FireClassChartItemDto>>> GetFireClassChart(long[] reportIds)

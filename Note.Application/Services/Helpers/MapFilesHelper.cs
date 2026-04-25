@@ -44,7 +44,7 @@ public static class MapFilesHelper
                 Latitude = markerDto.Latitude,
                 Longitude = markerDto.Longitude,
                 LocationName = markerDto.LocationName.Trim(),
-                FireClass = markerDto.FireClass,
+                FireClass = (FireClassEnum)markerDto.FireClass,
                 Comment = string.IsNullOrWhiteSpace(markerDto.Comment) ? null : markerDto.Comment.Trim(),
                 CreatedAt = DateTime.UtcNow,
                 Attachments = BuildMarkerAttachments(markerDto.Attachments) ?? new List<ReportMapMarkerAttachment>()
