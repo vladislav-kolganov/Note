@@ -11,6 +11,9 @@ using Note.Domain.Result;
 
 namespace Note.Application.Services;
 
+/// <summary>
+/// Сервис для формирования данных диаграмм на основе маркеров карты.
+/// </summary>
 public class DiagramService : IDiagramService
 {
     private readonly IBaseRepository<ReportMapMarker> _reportMapMarkerRepository;
@@ -20,6 +23,18 @@ public class DiagramService : IDiagramService
         _reportMapMarkerRepository = reportMapMarkerRepository;
     }
 
+    /// <summary>
+    /// Получает данные для построения диаграммы количества меток пожара
+    /// по местности и классу пожара.
+    /// </summary>
+    /// <param name="reportIds">
+    /// Массив идентификаторов отчётов, по которым необходимо получить данные для диаграммы.
+    /// </param>
+    /// <returns>
+    /// Результат выполнения операции, содержащий коллекцию элементов диаграммы.
+    /// В каждом элементе указано название местности и количество меток пожара
+    /// малого, среднего и большого класса.
+    /// </returns>
     public async Task<CollectionResult<FireClassChartItemDto>> GetFireClassChartAsync(long[] reportIds)
     {
         if (reportIds.IsNullOrEmpty())
@@ -33,6 +48,7 @@ public class DiagramService : IDiagramService
 
         var markers = await _reportMapMarkerRepository
             .GetAll()
+            .AsNoTracking()
             .Where(x => reportIds.Contains(x.ReportId))
             .ToArrayAsync();
 

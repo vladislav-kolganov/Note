@@ -5,6 +5,9 @@ using Note.Domain.Result;
 
 namespace Note.API.Controllers;
 
+/// <summary>
+/// Контроллер для работы с диаграммами.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class DiagramController : Controller
