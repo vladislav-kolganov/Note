@@ -12,6 +12,7 @@ public enum ErrorCodes
     YouCantShareTheReportWithYourself = 4,
     YouDontHaveTheRightsToShareThisReport = 5,
     YouDontHaveTheRrightsToEditThisReport = 6,
+    ReportMapMarkerNotFound = 7,
 
     InvalidClientRequest = 9,
     InternalServerError = 10,

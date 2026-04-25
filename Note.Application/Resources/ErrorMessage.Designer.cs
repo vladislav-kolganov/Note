@@ -196,6 +196,15 @@ namespace Note.Application.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Маркеры в отчётах не найдены.
+        /// </summary>
+        internal static string ReportMapMarkerNotFound {
+            get {
+                return ResourceManager.GetString("ReportMapMarkerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Отчёт не найден.
         /// </summary>
         internal static string ReportNotFound {

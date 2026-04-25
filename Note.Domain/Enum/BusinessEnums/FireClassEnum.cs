@@ -2,7 +2,7 @@
 
 public enum FireClassEnum
 {
-    Big = 0,
-    Middle = 1,
-    Small = 2
+    Small = 0,
+    Medium = 1,
+    Large = 2
 }

@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, TokenService>();
         services.AddTransient<IChatService, ChatService>();
         services.AddTransient<IUserService, UserService>();
+        services.AddScoped<IDiagramService, DiagramService>();
     }
 
     public static void InitFluentValidation(this IServiceCollection services)
@@ -52,5 +53,4 @@ public static class DependencyInjection
     {
         services.AddScoped<ICastomValidator, CastomValidator>();
     }
-
 }

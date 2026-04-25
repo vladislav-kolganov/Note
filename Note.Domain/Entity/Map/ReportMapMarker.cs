@@ -1,4 +1,5 @@
-﻿using Note.Domain.Interfaces;
+﻿using Note.Domain.Enum.BusinessEnums;
+using Note.Domain.Interfaces;
 
 namespace Note.Domain.Entity.Map;
 
@@ -35,7 +36,7 @@ public class ReportMapMarker : IEntityId<long>
     /// <summary>
     /// Класс пожара.
     /// </summary>
-    public int FireClass { get; set; }
+    public FireClassEnum FireClass { get; set; }
 
     /// <summary>
     /// Комментарий.

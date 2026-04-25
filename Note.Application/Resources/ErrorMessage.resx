@@ -195,4 +195,7 @@
   <data name="YouDontHaveTheRrightsToEditThisReport" xml:space="preserve">
     <value>У вас нет прав редактировать этот отчёт</value>
   </data>
+  <data name="ReportMapMarkerNotFound" xml:space="preserve">
+    <value>Маркеры в отчётах не найдены</value>
+  </data>
 </root>

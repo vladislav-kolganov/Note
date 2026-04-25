@@ -195,4 +195,7 @@
   <data name="YouDontHaveTheRrightsToEditThisReport" xml:space="preserve">
     <value>You don't have the rights to edit this report</value>
   </data>
+  <data name="ReportMapMarkerNotFound" xml:space="preserve">
+    <value>Report map marker not found</value>
+  </data>
 </root>
