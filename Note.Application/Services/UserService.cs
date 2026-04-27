@@ -149,20 +149,19 @@ public class UserService : IUserService
             var trimmedLogin = login.Trim();
             var normalizedSearch = LoginSearchHelper.Normalize(trimmedLogin);
 
-            if (normalizedSearch.Length < 2)
+            if (normalizedSearch.Length < 1)
             {
                 return new CollectionResult<UserFindDto>()
                 {
-                    ErrorMessage = "Введите минимум 2 символа для поиска.",
+                    ErrorMessage = "Введите минимум 1 символ для поиска.",
                     ErrorCode = (int)ErrorChatCodes.UserLoginIsEmpty
                 };
             }
 
-            var searchPattern = $"%{trimmedLogin}%";
-
             var candidates = await _userRepository
                 .GetAll()
-                .Where(x => EF.Functions.Like(x.Login, searchPattern))
+                .Where(x => x.Login.ToLower().Contains(normalizedSearch))
+                .OrderBy(x => x.Login)
                 .Take(100)
                 .ToArrayAsync();
 
