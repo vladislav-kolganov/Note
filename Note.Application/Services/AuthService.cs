@@ -142,12 +142,49 @@ public class AuthService : IAuthService
                 ErrorCode = (int)ErrorCodes.PasswordNotEqualPasswordConfirm
             };
         }
-        if (dto.Login.Length < 2 || string.IsNullOrWhiteSpace(dto.Login))
+
+        if (string.IsNullOrWhiteSpace(dto.Login))
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.UserLoginIsEmpty,
+                ErrorCode = (int)ErrorCodes.InvalidClientRequest
+            };
+        }
+
+        if (dto.Login.Length < 5)
         {
             return new BaseResult<UserDto>()
             {
                 ErrorMessage = ErrorMessage.MinimalLengthLoginIsThreeSymbols,
                 ErrorCode = (int)ErrorCodes.MinimalLengthLoginIsThreeSymbols
+            };
+        }
+
+        if (dto.Login.Any(char.IsWhiteSpace))
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.LoginMustNotContainSpaces,
+                ErrorCode = (int)ErrorCodes.LoginMustNotContainSpaces
+            };
+        }
+
+        if (!IsValidLoginChars(dto.Login))
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.LoginInvalidCharacters,
+                ErrorCode = (int)ErrorCodes.LoginInvalidCharacters
+            };
+        }
+
+        if (!dto.Login.Any(c => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z'))
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.LoginMustContainLatinLetter,
+                ErrorCode = (int)ErrorCodes.LoginMustContainLatinLetter
             };
         }
 
@@ -304,5 +341,13 @@ public class AuthService : IAuthService
         var hash = HashPassword(userPassword);
 
         return hash == userHashPassword;
+    }
+
+    private static readonly HashSet<char> AllowedLoginChars = new(
+    @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:,.?/\|");
+
+    private static bool IsValidLoginChars(string login)
+    {
+        return login.All(c => AllowedLoginChars.Contains(c));
     }
 }

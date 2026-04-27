@@ -115,6 +115,33 @@ namespace Note.Application.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Логин может содержать только латинские буквы, цифры и спецсимволы из разрешённого набора: !@#$%^&amp;*()-_=+[]{};:,.?/\|.
+        /// </summary>
+        internal static string LoginInvalidCharacters {
+            get {
+                return ResourceManager.GetString("LoginInvalidCharacters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Логин должен содержать буквы латтиницы.
+        /// </summary>
+        internal static string LoginMustContainLatinLetter {
+            get {
+                return ResourceManager.GetString("LoginMustContainLatinLetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Логин не должен иметь пробелов.
+        /// </summary>
+        internal static string LoginMustNotContainSpaces {
+            get {
+                return ResourceManager.GetString("LoginMustNotContainSpaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пустое сообщение.
         /// </summary>
         internal static string MessageIsEmpty {

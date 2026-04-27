@@ -198,4 +198,13 @@
   <data name="ReportMapMarkerNotFound" xml:space="preserve">
     <value>Report map marker not found</value>
   </data>
+  <data name="LoginMustNotContainSpaces" xml:space="preserve">
+    <value>Login must not contain spaces</value>
+  </data>
+  <data name="LoginMustContainLatinLetter" xml:space="preserve">
+    <value>login must contain Latin letter</value>
+  </data>
+  <data name="LoginInvalidCharacters" xml:space="preserve">
+    <value>Login invalid characters</value>
+  </data>
 </root>

@@ -198,4 +198,13 @@
   <data name="ReportMapMarkerNotFound" xml:space="preserve">
     <value>Маркеры в отчётах не найдены</value>
   </data>
+  <data name="LoginMustNotContainSpaces" xml:space="preserve">
+    <value>Логин не должен иметь пробелов</value>
+  </data>
+  <data name="LoginMustContainLatinLetter" xml:space="preserve">
+    <value>Логин должен содержать буквы латтиницы</value>
+  </data>
+  <data name="LoginInvalidCharacters" xml:space="preserve">
+    <value>Логин может содержать только латинские буквы, цифры и спецсимволы из разрешённого набора: !@#$%^&amp;*()-_=+[]{};:,.?/\|s</value>
+  </data>
 </root>
