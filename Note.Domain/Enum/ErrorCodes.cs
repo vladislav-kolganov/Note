@@ -25,10 +25,14 @@ public enum ErrorCodes
     PasswordNotEqualPasswordConfirm = 21,
     PasswordIsWrong = 22,
     OldPasswordNotEqualEntryPassword = 23,
-    MinimalLengthLoginIsThreeSymbols = 24,
+    MinimalLengthLoginIsFiveSymbols = 24,
     LoginInvalidCharacters = 25,
     LoginMustContainLatinLetter = 26,
     LoginMustNotContainSpaces = 27,
+    UserLoginIsEmpty = 28,
+    UserPasswordIsEmpty = 29,
+    MinimalLengthPasswordIsFiveSymbols = 30,
+    PasswordMustNotContainSpaces = 31,
 
     RoleAlreadyExists = 31,
     RoleNotFound = 32

@@ -180,8 +180,8 @@
   <data name="OldPasswordNotEqualEntryPassword" xml:space="preserve">
     <value>The entered password not equal old password</value>
   </data>
-  <data name="MinimalLengthLoginIsThreeSymbols" xml:space="preserve">
-    <value>Minimal length login is three symbols</value>
+  <data name="MinimalLengthLoginIsFiveSymbols" xml:space="preserve">
+    <value>Minimal length login is five symbols</value>
   </data>
   <data name="ReportAlreadyShared" xml:space="preserve">
     <value>Report already shared</value>
@@ -206,5 +206,14 @@
   </data>
   <data name="LoginInvalidCharacters" xml:space="preserve">
     <value>Login invalid characters</value>
+  </data>
+  <data name="UserPasswordIsEmpty" xml:space="preserve">
+    <value>User password is empty</value>
+  </data>
+  <data name="MinimalLengthPasswordIsFiveSymbols" xml:space="preserve">
+    <value>Minimal length password is five symbols</value>
+  </data>
+  <data name="PasswordMustNotContainSpaces" xml:space="preserve">
+    <value>Password must not contain spaces</value>
   </data>
 </root>

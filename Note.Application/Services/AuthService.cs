@@ -26,7 +26,6 @@ public class AuthService : IAuthService
     private readonly IBaseRepository<User> _userRepository;
     private readonly IBaseRepository<UserToken> _userTokenRepository;
     private readonly IBaseRepository<Role> _roleRepository;
-    private readonly IBaseRepository<UserRole> _userRoleRepository;
     private readonly ILogger<AuthService> _logger;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
@@ -38,7 +37,6 @@ public class AuthService : IAuthService
         IBaseRepository<UserToken> userTokenRepository,
         ITokenService tokenService,
         IBaseRepository<Role> roleRepository,
-        IBaseRepository<UserRole> userRoleRepository,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepositoory;
@@ -47,7 +45,6 @@ public class AuthService : IAuthService
         _userTokenRepository = userTokenRepository;
         _tokenService = tokenService;
         _roleRepository = roleRepository;
-        _userRoleRepository = userRoleRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -143,12 +140,39 @@ public class AuthService : IAuthService
             };
         }
 
+        if (string.IsNullOrWhiteSpace(dto.Password) || string.IsNullOrWhiteSpace(dto.Password))
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.UserPasswordIsEmpty,
+                ErrorCode = (int)ErrorCodes.UserPasswordIsEmpty
+            };
+        }
+
+        if (dto.Password.Length < 5 || dto.PasswordConfirm.Length < 5)
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.MinimalLengthPasswordIsFiveSymbols,
+                ErrorCode = (int)ErrorCodes.MinimalLengthPasswordIsFiveSymbols
+            };
+        }
+
+        if (dto.Password.Any(char.IsWhiteSpace) || dto.PasswordConfirm.Any(char.IsWhiteSpace))
+        {
+            return new BaseResult<UserDto>()
+            {
+                ErrorMessage = ErrorMessage.PasswordMustNotContainSpaces,
+                ErrorCode = (int)ErrorCodes.PasswordMustNotContainSpaces
+            };
+        }
+
         if (string.IsNullOrWhiteSpace(dto.Login))
         {
             return new BaseResult<UserDto>()
             {
                 ErrorMessage = ErrorMessage.UserLoginIsEmpty,
-                ErrorCode = (int)ErrorCodes.InvalidClientRequest
+                ErrorCode = (int)ErrorCodes.UserLoginIsEmpty
             };
         }
 
@@ -156,8 +180,8 @@ public class AuthService : IAuthService
         {
             return new BaseResult<UserDto>()
             {
-                ErrorMessage = ErrorMessage.MinimalLengthLoginIsThreeSymbols,
-                ErrorCode = (int)ErrorCodes.MinimalLengthLoginIsThreeSymbols
+                ErrorMessage = ErrorMessage.MinimalLengthLoginIsFiveSymbols,
+                ErrorCode = (int)ErrorCodes.MinimalLengthLoginIsFiveSymbols
             };
         }
 
@@ -251,8 +275,6 @@ public class AuthService : IAuthService
                 return LogErrorHelper<UserDto>.LogException(ex.Message, _logger);
             }
         }
-
-
     }
 
     /// <summary>

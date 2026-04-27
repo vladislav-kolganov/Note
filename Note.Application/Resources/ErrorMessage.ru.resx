@@ -180,8 +180,8 @@
   <data name="OldPasswordNotEqualEntryPassword" xml:space="preserve">
     <value>Старый пароль не совпадает с введенным</value>
   </data>
-  <data name="MinimalLengthLoginIsThreeSymbols" xml:space="preserve">
-    <value>Минимальное значение логина не менее 3х символов</value>
+  <data name="MinimalLengthLoginIsFiveSymbols" xml:space="preserve">
+    <value>Минимальное значение логина не менее 5 символов</value>
   </data>
   <data name="ReportAlreadyShared" xml:space="preserve">
     <value>Вы уже поделились этим отчётом с данным пользователем</value>
@@ -206,5 +206,14 @@
   </data>
   <data name="LoginInvalidCharacters" xml:space="preserve">
     <value>Логин может содержать только латинские буквы, цифры и спецсимволы из разрешённого набора: !@#$%^&amp;*()-_=+[]{};:,.?/\|s</value>
+  </data>
+  <data name="UserPasswordIsEmpty" xml:space="preserve">
+    <value>Пароль пользователя пуст</value>
+  </data>
+  <data name="MinimalLengthPasswordIsFiveSymbols" xml:space="preserve">
+    <value>Минимальная длина пароля не менее 5 символов</value>
+  </data>
+  <data name="PasswordMustNotContainSpaces" xml:space="preserve">
+    <value>Пароль не должен иметь пробелов</value>
   </data>
 </root>

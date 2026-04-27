@@ -169,11 +169,20 @@ namespace Note.Application.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Минимальное значение логина не менее 3х символов.
+        ///   Ищет локализованную строку, похожую на Минимальное значение логина не менее 5х символов.
         /// </summary>
-        internal static string MinimalLengthLoginIsThreeSymbols {
+        internal static string MinimalLengthLoginIsFiveSymbols {
             get {
-                return ResourceManager.GetString("MinimalLengthLoginIsThreeSymbols", resourceCulture);
+                return ResourceManager.GetString("MinimalLengthLoginIsFiveSymbols", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Минимальная длина пароля не менее 5 символов.
+        /// </summary>
+        internal static string MinimalLengthPasswordIsFiveSymbols {
+            get {
+                return ResourceManager.GetString("MinimalLengthPasswordIsFiveSymbols", resourceCulture);
             }
         }
         
@@ -192,6 +201,15 @@ namespace Note.Application.Resources {
         internal static string PasswordIsWrong {
             get {
                 return ResourceManager.GetString("PasswordIsWrong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пароль не должен иметь пробелов.
+        /// </summary>
+        internal static string PasswordMustNotContainSpaces {
+            get {
+                return ResourceManager.GetString("PasswordMustNotContainSpaces", resourceCulture);
             }
         }
         
@@ -300,6 +318,15 @@ namespace Note.Application.Resources {
         internal static string UserNotFound {
             get {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пароль пользователя пуст.
+        /// </summary>
+        internal static string UserPasswordIsEmpty {
+            get {
+                return ResourceManager.GetString("UserPasswordIsEmpty", resourceCulture);
             }
         }
         
