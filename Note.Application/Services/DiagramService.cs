@@ -62,7 +62,7 @@ public class DiagramService : IDiagramService
         }
 
         var chartItems = markers
-            .GroupBy(x => x.LocationName.Trim().ToLower())
+            .GroupBy(x => x.LocationName.Trim())
             .Select(group => new FireClassChartItemDto
             {
                 LocationName = group.Key,
@@ -71,9 +71,11 @@ public class DiagramService : IDiagramService
 
                 MediumCount = group.Count(marker => marker.FireClass == FireClassEnum.Medium),
 
-                LargeCount = group.Count(marker => marker.FireClass == FireClassEnum.Large)
+                LargeCount = group.Count(marker => marker.FireClass == FireClassEnum.Large),
+
+                NoFireCount = group.Count(marker => marker.FireClass == FireClassEnum.None)
             })
-            .OrderByDescending(item => item.SmallCount + item.MediumCount + item.LargeCount)
+            .OrderByDescending(item => item.NoFireCount + item.SmallCount + item.MediumCount + item.LargeCount)
             .ToArray();
 
         return new CollectionResult<FireClassChartItemDto>

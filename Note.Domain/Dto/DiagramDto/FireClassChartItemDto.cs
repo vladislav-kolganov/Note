@@ -26,6 +26,11 @@ public class FireClassChartItemDto
     public int LargeCount { get; set; }
 
     /// <summary>
+    /// Количество меток без пожара.
+    /// </summary>
+    public int? NoFireCount { get; set; }
+
+    /// <summary>
     /// Общее количество меток пожара по местности.
     /// </summary>
     public int TotalCount => SmallCount + MediumCount + LargeCount;
