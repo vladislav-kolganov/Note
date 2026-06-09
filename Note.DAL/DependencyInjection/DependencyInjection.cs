@@ -39,5 +39,6 @@ public static class DependencyInjection
 
     private static IServiceCollection AddSettings(this IServiceCollection services,
     IConfiguration configuration) =>
-    services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
+    services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)))
+            .Configure<EncryptionSettings>(configuration.GetSection(nameof(EncryptionSettings)));
 }
