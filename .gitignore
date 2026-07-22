@@ -361,3 +361,69 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+##
+## Дополнения под стек проекта (Note): .NET + Docker, Redis, RabbitMQ, Mongo, Prometheus/Grafana
+##
+
+# ── IDE: JetBrains Rider / IntelliJ ──────────────────────────────────────────
+.idea/
+*.sln.iml
+
+# ── IDE: Visual Studio Code ──────────────────────────────────────────────────
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ── Секреты и конфигурация окружения ─────────────────────────────────────────
+# Никогда не коммитим секреты и локальные настройки окружения.
+.env
+.env.*
+!.env.example
+*.local.json
+appsettings.*.Local.json
+secrets.json
+*.secret
+*.key
+*.pem
+
+# ── Docker: локальные тома и данные контейнеров ──────────────────────────────
+docker-data/
+[Dd]ocker-[Dd]ata/
+volumes/
+pgdata/
+redis-data/
+mongo-data/
+rabbitmq-data/
+
+# ── Инфраструктура: локальные снимки и runtime-данные ────────────────────────
+grafana/data/
+prometheus/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Временные и сгенерированные файлы проекта ────────────────────────────────
+output.json
+[Tt]emp/
+*.out
+
+# ── Операционная система: служебные файлы ────────────────────────────────────
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+# Windows
+[Tt]humbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
